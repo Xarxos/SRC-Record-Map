@@ -29,7 +29,7 @@ public class Database {
             game.storeData(cleanedDataArray);
             games.put(gameId, game);
             //game.printAll();
-            printCategories();
+            //printCategories();
         }
     }
 

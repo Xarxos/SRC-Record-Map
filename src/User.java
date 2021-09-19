@@ -18,7 +18,6 @@ public class User {
 
     public void storeData(ArrayList<String> cleanedDataArray) {
         for (int i = 0; i < cleanedDataArray.size(); i++) {
-            //System.out.println(cleanedDataArray.get(i));
             if (cleanedDataArray.get(i).compareTo("international") == 0
                 && cleanedDataArray.get(i-3).compareTo("code") != 0
             ) {

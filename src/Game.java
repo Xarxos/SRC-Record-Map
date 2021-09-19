@@ -6,8 +6,6 @@ import java.net.URL;
 import java.util.ArrayList;
 
 public class Game {
-    private String gameURL = "https://www.speedrun.com/api/v1/games/";
-    //private String allData = "";
     private Database database;
 
     private String id;
@@ -20,52 +18,6 @@ public class Game {
     public Game(String id, Database database) {
         this.id = id;
         this.database = database;
-        gameURL = gameURL.concat(id);
-    }
-/*
-    public void parseGame() {
-        String allData = fetchApiData(gameURL);
-
-        ArrayList<String> cleanedDataArray = cleanData(allData);
-
-        storeGameData(cleanedDataArray);
-
-        printAll();
-    }
-*/
-    private String fetchApiData(String urlStr) {
-        URL url = null;
-        HttpsURLConnection con = null;
-        String allData = null;
-
-        try {
-            url = new URL(urlStr);
-            con = (HttpsURLConnection) url.openConnection();
-            con.setRequestMethod("GET");
-
-            allData = getAllData(con);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        con.disconnect();
-
-        return allData;
-    }
-
-    private ArrayList<String> cleanData(String allData) {
-        allData = allData.replaceAll("\\[|\\]|\\{|\\}", "");
-        String[] baseDataArray = allData.split(",|\"");
-        ArrayList<String> cleanedDataArray = new ArrayList<>();
-
-        for (String str: baseDataArray) {
-            //System.out.println(str);
-            if (!str.isBlank() && str.compareTo(":") != 0 ) {
-                cleanedDataArray.add(str);
-            }
-        }
-
-        return cleanedDataArray;
     }
 
     public void storeData(ArrayList<String> cleanedDataArray) {
@@ -95,19 +47,6 @@ public class Game {
                 //categories = database.parseCategories(catUrl, this);
             }
         }
-    }
-
-    public String getAllData(HttpsURLConnection con) throws IOException {
-        BufferedReader in = new BufferedReader(
-                new InputStreamReader(con.getInputStream()));
-        String inputLine;
-        String allData = "";
-        while ((inputLine = in.readLine()) != null) {
-            allData = allData.concat(inputLine);
-        }
-        //System.out.println(this.allData);
-        in.close();
-        return allData;
     }
 
     public void printAll() {

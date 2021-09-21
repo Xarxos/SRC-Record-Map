@@ -13,6 +13,7 @@ public class RecordMap {
     private BufferedImage prettyMap;
     private Map<Integer, Nation> nations = new HashMap<>();
     private Nation drawNation;
+    private final double scaleFactor = 0.341;
 
     public RecordMap() throws IOException {
         dataMap = ImageIO.read(getClass().getResource("/dataMap.png"));
@@ -21,24 +22,29 @@ public class RecordMap {
         dataMap = scaleImage(dataMap);
         prettyMap = scaleImage(prettyMap);
 
-        Nation england = new Nation("/England.png", 193, 26, 14, 2715, 405);
-        england.setOnMapImage(scaleImage(england.getOnMapImage()));
-        nations.put(england.getDataColor(), england);
+        defineNation(new Nation("/England.png", 193, 26, 14, 2713, 403));
+        defineNation(new Nation("/Scotland.png", 199, 175, 12, 2687, 341));
+        defineNation(new Nation("/Morocco.png", 191, 110, 62, 2597, 797));
+        defineNation(new Nation("/Poland.png", 197, 92, 106, 3049, 451));
+        defineNation(new Nation("/Saxony.png", 155, 147, 180, 2963, 485));
     }
 
     private BufferedImage scaleImage(BufferedImage image) {
-        double scaleFactorY = 0.25;
-        double scaleFactorX = 0.25;
-
         int w = image.getWidth();
         int h = image.getHeight();
         BufferedImage scaledSprite = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
         AffineTransform at = new AffineTransform();
-        at.scale(scaleFactorX, scaleFactorY);
+        at.scale(scaleFactor, scaleFactor);
         AffineTransformOp scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
         scaledSprite = scaleOp.filter(image, scaledSprite);
 
         return scaledSprite;
+    }
+
+    private void defineNation(Nation nation) throws IOException {
+        nation.setOnMapImage(scaleImage(nation.getOnMapImage()));
+        nation.setScale(scaleFactor);
+        nations.put(nation.getDataColor(), nation);
     }
 
     public void printPixelColor(int x, int y) {
@@ -99,7 +105,7 @@ public class RecordMap {
         g.drawImage(prettyMap, 0, 0, panel);
         if (drawNation != null) {
             //System.out.println("Not Null");
-            g.drawImage(drawNation.getOnMapImage(), (int)(drawNation.getMapPos().x * 0.25), (int)(drawNation.getMapPos().y * 0.25), panel);
+            g.drawImage(drawNation.getOnMapImage(), drawNation.getMapPos().x, drawNation.getMapPos().y, panel);
         }
         //System.out.println("Not null");
     }

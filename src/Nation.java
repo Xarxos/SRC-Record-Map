@@ -21,6 +21,10 @@ public class Nation {
         this.mapPos = new Point(x,y);
     }
 
+    public void setScale(double scaleFactor) {
+        this.mapPos = new Point((int)(this.mapPos.x * scaleFactor), (int)(this.mapPos.y * scaleFactor));
+    }
+
     public BufferedImage getOnMapImage() {
         return onMapImage;
     }

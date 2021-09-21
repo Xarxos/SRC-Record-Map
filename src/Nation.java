@@ -11,9 +11,9 @@ public class Nation {
 
     private Category category;
 
-    public Nation(String imgPath, int r, int g, int b, int x, int y, Database database, String categoryId) throws IOException {
+    public Nation(String name, int r, int g, int b, int x, int y, Database database, String categoryId) throws IOException {
         this.database = database;
-        this.onMapImage = ImageIO.read(getClass().getResource(imgPath));
+        this.onMapImage = ImageIO.read(getClass().getResource("/images/" + name + ".png"));
 
         r = (r << 16) & 0x00FF0000; //Shift red 16-bits and mask out other stuff
         g = (g << 8) & 0x0000FF00; //Shift Green 8-bits and mask out other stuff

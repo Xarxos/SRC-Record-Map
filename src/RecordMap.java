@@ -16,17 +16,17 @@ public class RecordMap {
     private final double scaleFactor = 0.341;
 
     public RecordMap(Database database) throws IOException {
-        dataMap = ImageIO.read(getClass().getResource("/dataMap.png"));
-        prettyMap = ImageIO.read(getClass().getResource("/prettyMap.png"));
+        dataMap = ImageIO.read(getClass().getResource("/images/dataMap.png"));
+        prettyMap = ImageIO.read(getClass().getResource("/images/prettyMap.png"));
 
         dataMap = scaleImage(dataMap);
         prettyMap = scaleImage(prettyMap);
 
-        defineNation(new Nation("/England.png", 193, 26, 14, 2713, 403, database, "owoj37v9"));
-        defineNation(new Nation("/Scotland.png", 199, 175, 12, 2687, 341, database, "69z5neo9"));
-        defineNation(new Nation("/Morocco.png", 191, 110, 62, 2597, 797, database, "n931m8nd"));
-        defineNation(new Nation("/Poland.png", 197, 92, 106, 3049, 451, database, "rw61lzp9"));
-        defineNation(new Nation("/Saxony.png", 155, 147, 180, 2963, 485, database, "rdn7qrq9"));
+        defineNation(new Nation("England", 193, 26, 14, 2713, 403, database, "owoj37v9"));
+        defineNation(new Nation("Scotland", 199, 175, 12, 2687, 341, database, "69z5neo9"));
+        defineNation(new Nation("Morocco", 191, 110, 62, 2597, 797, database, "n931m8nd"));
+        defineNation(new Nation("Poland", 197, 92, 106, 3049, 451, database, "rw61lzp9"));
+        defineNation(new Nation("Saxony", 155, 147, 180, 2963, 485, database, "rdn7qrq9"));
     }
 
     private BufferedImage scaleImage(BufferedImage image) {

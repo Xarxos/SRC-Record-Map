@@ -7,8 +7,12 @@ public class Nation {
     private BufferedImage onMapImage;
     private int dataColor;
     private Point mapPos;
+    private Database database;
 
-    public Nation(String imgPath, int r, int g, int b, int x, int y) throws IOException {
+    private Category category;
+
+    public Nation(String imgPath, int r, int g, int b, int x, int y, Database database, String categoryId) throws IOException {
+        this.database = database;
         this.onMapImage = ImageIO.read(getClass().getResource(imgPath));
 
         r = (r << 16) & 0x00FF0000; //Shift red 16-bits and mask out other stuff
@@ -16,9 +20,9 @@ public class Nation {
         b = b & 0x000000FF; //Mask out anything not blue.
         this.dataColor = 0xFF000000 | r | g | b;
 
-        System.out.println(dataColor);
-
         this.mapPos = new Point(x,y);
+
+        this.category = database.getCategory(categoryId);
     }
 
     public void setScale(double scaleFactor) {
@@ -39,5 +43,9 @@ public class Nation {
 
     public Point getMapPos() {
         return mapPos;
+    }
+
+    public Category getCategory() {
+        return category;
     }
 }

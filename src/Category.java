@@ -36,6 +36,10 @@ public class Category {
                 this.runs = database.parseRuns(cleanedDataArray.get(i+2));
             }
         }
+        if(this.name.contains("Reform ")) {
+            System.out.println("name: " + name);
+            System.out.println("id: " + id);
+        }
     }
 
     public void printAll() {

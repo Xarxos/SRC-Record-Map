@@ -5,7 +5,7 @@ import java.io.IOException;
 public class GUI {
     private final Panel panel;
 
-    public GUI() {
+    public GUI(Database database) {
         JFrame frame = new JFrame("Map");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -18,7 +18,7 @@ public class GUI {
         RecordMap map = null;
 
         try {
-            map = new RecordMap();
+            map = new RecordMap(database);
         } catch (IOException e) {
             e.printStackTrace();
         }

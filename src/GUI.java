@@ -23,7 +23,7 @@ public class GUI {
             e.printStackTrace();
         }
         panel.setRecordMap(map);
-        panel.addMouseMotionListener(new MapMouse(map));
+        panel.addMouseMotionListener(new MapMouse(map, this));
         Loop loop = new Loop(panel);
 
     }

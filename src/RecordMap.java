@@ -3,41 +3,47 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class RecordMap {
-    private BufferedImage mapImage;
-    private BufferedImage topMap;
-    private ArrayList<Point> england = new ArrayList<>();
-    private boolean hoverEngland = false;
-    private int lastRGB = 0;
+    private BufferedImage dataMap;
+    private BufferedImage prettyMap;
+    private Map<Integer, Nation> nations = new HashMap<>();
+    private Nation drawNation;
 
     public RecordMap() throws IOException {
-        String img = "/testMap2.png";
-        mapImage = ImageIO.read(getClass().getResource(img));
-        topMap = ImageIO.read(getClass().getResource(img));
+        dataMap = ImageIO.read(getClass().getResource("/dataMap.png"));
+        prettyMap = ImageIO.read(getClass().getResource("/prettyMap.png"));
 
-        double scaleFactorY = 1;
-        double scaleFactorX = 1;
+        dataMap = scaleImage(dataMap);
+        prettyMap = scaleImage(prettyMap);
 
-        int w = mapImage.getWidth();
-        int h = mapImage.getHeight();
+        Nation england = new Nation("/England.png", 193, 26, 14, 2715, 405);
+        england.setOnMapImage(scaleImage(england.getOnMapImage()));
+        nations.put(england.getDataColor(), england);
+    }
+
+    private BufferedImage scaleImage(BufferedImage image) {
+        double scaleFactorY = 0.25;
+        double scaleFactorX = 0.25;
+
+        int w = image.getWidth();
+        int h = image.getHeight();
         BufferedImage scaledSprite = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
         AffineTransform at = new AffineTransform();
         at.scale(scaleFactorX, scaleFactorY);
         AffineTransformOp scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
-        scaledSprite = scaleOp.filter(mapImage, scaledSprite);
-        mapImage = scaledSprite;
+        scaledSprite = scaleOp.filter(image, scaledSprite);
 
-        storeEngland();
-        //highlightEngland(true);
+        return scaledSprite;
     }
 
     public void printPixelColor(int x, int y) {
-        if (x < mapImage.getWidth() && y < mapImage.getHeight()) {
-            int rgb = mapImage.getRGB(x,y);
+        if (x < dataMap.getWidth() && y < dataMap.getHeight()) {
+            int rgb = dataMap.getRGB(x,y);
             int red = (rgb >> 16) & 0xFF;
             int green = (rgb >> 8) & 0xFF;
             int blue = rgb & 0xFF;
@@ -48,49 +54,27 @@ public class RecordMap {
         }
     }
 
-    private void storeEngland() {
-        for (int x = 0; x < mapImage.getWidth(); x++) {
-            for (int y = 0; y < mapImage.getHeight(); y++) {
-                if (mapImage.getRGB(x,y) == -4122098) {
-                    england.add(new Point(x,y));
-                }
-            }
-        }
-    }
-
     public void hover(int x, int y) {
-        if (x < mapImage.getWidth() && y < mapImage.getHeight()) {
-            int rgb = mapImage.getRGB(x,y);
-            if (rgb != lastRGB) {
-                if (rgb == -4122098) {
-                    System.out.println("ENGLAND!");
-                    highlightEngland(true);
-                } else if (lastRGB == -4122098) {
-                    System.out.println("ENGLANDN'T!");
-                    //highlightEngland(false);
+        if (x < dataMap.getWidth() && y < dataMap.getHeight()) {
+            int rgb = dataMap.getRGB(x,y);
+            if (rgb != -16777216) {
+                Nation hoverNation = nations.get(rgb);
+                if (hoverNation != drawNation) {
+                    drawNation = hoverNation;
+                    //System.out.println("ENGLAND!");
                 }
-                lastRGB = rgb;
+            }
+            else {
+                drawNation = null;
+                //System.out.println("ENGLANDN'T!");
             }
         }
-    }
-
-    public void highlightEngland(boolean highlight) {
-        System.out.println("1!");
-        int rgb = -4122098;
-        if (highlight) {
-            System.out.println("2!");
-            rgb = -3690740;
-        }
-        for (Point p : england) {
-            topMap.setRGB(p.x, p.y, rgb);
-        }
-        System.out.println("3!");
     }
 
     private void makePolygon(int startX, int startY) {
-        for (int x = 0; x < mapImage.getWidth(); x++) {
-            for (int y = 0; y < mapImage.getHeight(); y++) {
-                if (mapImage.getRGB(x,y) == -4122098) {
+        for (int x = 0; x < dataMap.getWidth(); x++) {
+            for (int y = 0; y < dataMap.getHeight(); y++) {
+                if (dataMap.getRGB(x,y) == -4122098) {
 
                 }
             }
@@ -104,14 +88,19 @@ public class RecordMap {
     private void checkNeighbors(int currentX, int currentY, int targetColor, ArrayList<Point> vertices) {
         for (int x = currentX-1; x <= currentX+1; x++) {
             for (int y = currentY-1; y <= currentY+1; y++) {
-                if (mapImage.getRGB(x,y) != targetColor) {
-                    vertices.
+                if (dataMap.getRGB(x,y) != targetColor) {
+
                 }
             }
         }
     }
 
     public void draw(Graphics2D g, Panel panel) {
-        g.drawImage(topMap, 0, 0, panel);
+        g.drawImage(prettyMap, 0, 0, panel);
+        if (drawNation != null) {
+            //System.out.println("Not Null");
+            g.drawImage(drawNation.getOnMapImage(), (int)(drawNation.getMapPos().x * 0.25), (int)(drawNation.getMapPos().y * 0.25), panel);
+        }
+        //System.out.println("Not null");
     }
 }

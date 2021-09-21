@@ -25,6 +25,6 @@ public class GUI {
         panel.setRecordMap(map);
         panel.addMouseMotionListener(new MapMouse(map, this));
         Loop loop = new Loop(panel);
-
+        loop.execute();
     }
 }

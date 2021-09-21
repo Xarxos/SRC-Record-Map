@@ -35,6 +35,7 @@ public class Loop extends SwingWorker<Void,Integer> {
 
                 accumulator -= delta;
             }
+            //System.out.println("Loop");
 
             panel.peent();
         }

@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Run {
+public class Run implements Comparable {
     enum TimingMethod {
         RTA_NS5,
         RTA_WS5,
@@ -17,10 +17,15 @@ public class Run {
     private Game game;
 
     private String comment;
+
     private User runner;
     private boolean verified = false;
     private User verifier;
+    private double pureTime;
     private int[] time = new int[4];
+
+
+
     private TimingMethod timingMethod;
     private Map<String, String> variableValues = new HashMap<>();
 
@@ -73,6 +78,7 @@ public class Run {
             }
             else if (cleanedDataArray.get(i).compareTo("primary_t") == 0) {
                 String cleaned = cleanedDataArray.get(i+1).replaceAll(":", "");
+                this.pureTime = Double.parseDouble(cleaned) / 3600000;
                 storeTime(Double.parseDouble(cleaned));
             }
             else if (cleanedDataArray.get(i).compareTo("values") == 0) {
@@ -116,6 +122,12 @@ public class Run {
         else if (valueLabel.contains("IGT")){
             this.timingMethod = TimingMethod.IGT_WSS;
         }
+        /*
+        else if (valueLabel.contains("null")) {
+            this.timingMethod = TimingMethod.RTA_WS5;
+        }
+
+         */
     }
 
     public void printAll(int numPrefixTabs) {
@@ -160,6 +172,10 @@ public class Run {
         }
     }
 
+    public void printRunner() {
+
+    }
+
     private void storeTime(double seconds) {
         int intSeconds = (int)seconds;
         seconds -= (double)intSeconds;
@@ -175,5 +191,52 @@ public class Run {
         time[3] = intSeconds;
     }
 
+    @Override
+    public int compareTo(Object compRun) {
+        //System.out.println("runner: " + runner.getName());
+        //printTime("\t");
+        //System.out.println("time: " + time[0] + "h / " + time[1] + "m / " + time[2] + "s / " + time[3] + "ms");
+        int methodThis = 0;
+        int methodComp = 0;
+        double valueThis;
+        double valueComp;
+
+        if(this.verified) {
+            if(this.timingMethod != null) {
+                methodThis = this.timingMethod.ordinal() + 1;
+            }
+            valueThis = (methodThis + this.pureTime);
+        }
+        else {
+            valueThis = Double.MAX_VALUE;
+        }
+
+        if(((Run)compRun).verified) {
+            if(((Run)compRun).timingMethod != null) {
+                methodComp = ((Run)compRun).timingMethod.ordinal() + 1;
+            }
+            valueComp = (methodComp + ((Run)compRun).pureTime);
+        }
+        else {
+            valueComp = Double.MAX_VALUE;
+        }
+
+        //System.out.println("\t" + (methodThis + this.pureTime));
+
+        double timeComp = valueThis - valueComp;
+        return timeComp < 0 ? -1 : 1;
+    }
+
+    public TimingMethod getTimingMethod() {
+        return timingMethod;
+    }
+
+    public User getRunner() {
+        return runner;
+    }
+
+    public int[] getTime() {
+        return time;
+    }
 }
 

@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class Category {
     private Database database;
@@ -11,12 +12,15 @@ public class Category {
     private boolean misc;
 
     private ArrayList<Run> runs = new ArrayList<>();
+    private int[] timingIndexes = new int[4];
     private ArrayList<Category> subcategories = new ArrayList<>();
 
     public Category(String id, Database database, Game game) {
         this.id = id;
         this.database = database;
         this.game = game;
+
+        java.util.Arrays.fill(timingIndexes, -1);
     }
 
     public void storeData(ArrayList<String> cleanedDataArray) {
@@ -34,11 +38,29 @@ public class Category {
             else if (cleanedDataArray.get(i).compareTo("runs") == 0) {
                 //System.out.println("Category: " + name);
                 this.runs = database.parseRuns(cleanedDataArray.get(i+2));
+                Collections.sort(this.runs);
+                storeTimingIndexes();
             }
         }
+        /*
         if(this.name.contains("Reform ")) {
             System.out.println("name: " + name);
             System.out.println("id: " + id);
+        }
+
+         */
+    }
+
+    private void storeTimingIndexes() {
+        int t = -1;
+        for(int i = 0; i < runs.size(); i++) {
+            if(runs.get(i).getTimingMethod() != null) {
+                if(runs.get(i).getTimingMethod().ordinal() != t) {
+                    t = runs.get(i).getTimingMethod().ordinal();
+                    this.timingIndexes[t] = i;
+                    //t++;
+                }
+            }
         }
     }
 
@@ -104,5 +126,12 @@ public class Category {
 
     public void setMisc(boolean misc) {
         this.misc = misc;
+    }
+
+    public Run getWR(int timingMethod) {
+        if(timingIndexes[timingMethod] != -1) {
+            return runs.get(timingIndexes[timingMethod]);
+        }
+        return null;
     }
 }

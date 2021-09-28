@@ -238,5 +238,33 @@ public class Run implements Comparable {
     public int[] getTime() {
         return time;
     }
+
+    public String[] getTimeString() {
+        if (timingMethod == TimingMethod.RTA_NS5 || timingMethod == TimingMethod.RTA_WS5) {
+            String[] timeString = new String[4];
+            timeString[0] = time[0] + " hours";
+            timeString[1] = time[1] + " minutes";
+            timeString[2] = time[2] + " seconds";
+
+            if (time[3] > 0) {
+                timeString[3] = time[3] + " milliseconds";
+            }
+
+            return timeString;
+            //return time[0] + " hours\n " + time[1] + " minutes \n " + time[2] + " seconds" + ms;
+        }
+        else if (timingMethod == TimingMethod.IGT || timingMethod == TimingMethod.IGT_WSS) {
+            String[] timeString = new String[4];
+            timeString[0] = time[0] + " years";
+            timeString[1] = time[1] + " months";
+            timeString[2] = time[2] + " days";
+
+            return timeString;
+            //return time[0] + " years\n " + time[1] + "months\n " + time[2] + "days";
+        }
+        else {
+            return null;
+        }
+    }
 }
 

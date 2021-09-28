@@ -4,6 +4,7 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class RecordBox extends JFrame {
+    private RecordMap map;
     private Category category;
     private Point pos;
 
@@ -11,15 +12,18 @@ public class RecordBox extends JFrame {
     private JTable table;
     private RecordTableModel recordTableModel = new RecordTableModel();
     private JTextArea textArea;
+    private JScrollPane scrollPane;
 
     public RecordBox() {
-        //this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        //this.map = map;
+        //this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
         table = new JTable(recordTableModel);
         table.setDefaultRenderer(String[].class, new RecordTableRenderer());
-        table.setRowHeight(80);
+        table.setRowHeight(65);
 
-
+        //this.setPreferredSize(new Dimension(1,1));
+        this.setLayout(new WrapLayout());
         panel = new JPanel();
         /*
         textArea = new JTextArea();
@@ -28,12 +32,15 @@ public class RecordBox extends JFrame {
         textArea.setEditable(false);
 
          */
-        JScrollPane scrollPane = new JScrollPane(table);
-        panel.setLayout(new BorderLayout());
-        panel.add(scrollPane, BorderLayout.CENTER);
-        this.setLayout(new BorderLayout());
+        scrollPane = new JScrollPane(table);
+        scrollPane.setPreferredSize(table.getPreferredSize());
+        panel.setLayout(new WrapLayout());
+        panel.add(table.getTableHeader());
+        panel.add(table);
+        panel.setPreferredSize(new Dimension(table.getPreferredSize().width, table.getPreferredSize().height + table.getTableHeader().getPreferredSize().height));
+
         //this.setMinimumSize(new Dimension(250,100));
-        this.add(panel, BorderLayout.CENTER);
+        this.add(panel);
         this.setResizable(false);
         this.pack();
         //this.setVisible(true);
@@ -61,6 +68,10 @@ public class RecordBox extends JFrame {
         recordTableModel.setRowCount(numWRs);
 
         recordTableModel.fireTableDataChanged();
+        //table.setPreferredSize(new Dimension(table.getPreferredSize().width, table.getRowCount() * table.getRowHeight()));
+        //scrollPane.setPreferredSize(new Dimension(table.getPreferredSize().width, table.getPreferredSize().height + table.getTableHeader().getPreferredSize().height));
+        panel.setPreferredSize(new Dimension(table.getPreferredSize().width, table.getPreferredSize().height + table.getTableHeader().getPreferredSize().height));
+        this.pack();
     }
 
     private void changeText() {
@@ -102,5 +113,6 @@ public class RecordBox extends JFrame {
         textArea.setText(finalText);
         this.pack();
     }
+
 
 }

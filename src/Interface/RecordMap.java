@@ -16,6 +16,7 @@ public class RecordMap {
     private Map<Integer, Nation> nations = new HashMap<>();
     private Nation drawNation;
     private final double scaleFactor = 0.341;
+    private boolean nationClicked = false;
 
     public RecordMap(GUI gui, Database database) throws IOException {
         this.gui = gui;
@@ -66,25 +67,36 @@ public class RecordMap {
     public void hover(int x, int y) {
         if (x < dataMap.getWidth() && y < dataMap.getHeight()) {
             int rgb = dataMap.getRGB(x,y);
-            if (rgb != -16777216) {
-                Nation hoverNation = nations.get(rgb);
-                if (hoverNation != drawNation && hoverNation != null) {
-                    drawNation = hoverNation;
-                    //gui.showRecordBox(drawNation.getCategory());
-                    gui.getRecordBox().setCategory(drawNation.getCategory());
-                    gui.getRecordBox().setLocation(drawNation.getMapPos().x,drawNation.getMapPos().y);
-                    gui.getRecordBox().setVisible(true);
-                    //System.out.println(rgb);
-                    drawNation.getCategory().printName();
-                    //System.out.println("ENGLAND!");
+            if(!nationClicked) {
+                if (rgb != -16777216) {
+                    Nation hoverNation = nations.get(rgb);
+                    if (hoverNation != drawNation && hoverNation != null) {
+                        drawNation = hoverNation;
+                        //drawNation.getCategory().printName();
+                    }
+                }
+                else {
+                    drawNation = null;
                 }
             }
-            else {
-                drawNation = null;
-                gui.hideRecordBox();
-                gui.getRecordBox().setVisible(false);
-                //System.out.println("ENGLANDN'T!");
+
+        }
+    }
+
+    public void click(int x, int y) {
+        int rgb = dataMap.getRGB(x,y);
+        if(!nationClicked) {
+            nationClicked = true;
+            if(rgb != -16777216) {
+                gui.getRecordBox().setCategory(drawNation.getCategory());
+                gui.getRecordBox().setLocation(x+100,y+100);
+                gui.getRecordBox().setVisible(true);
             }
+        }
+        else {
+            gui.getRecordBox().setVisible(false);
+            nationClicked = false;
+            drawNation = null;
         }
     }
 
@@ -96,10 +108,6 @@ public class RecordMap {
                 }
             }
         }
-    }
-
-    private void traceOutline() {
-
     }
 
     private void checkNeighbors(int currentX, int currentY, int targetColor, ArrayList<Point> vertices) {
@@ -119,5 +127,13 @@ public class RecordMap {
             g.drawImage(drawNation.getOnMapImage(), drawNation.getMapPos().x, drawNation.getMapPos().y, panel);
         }
         //System.out.println("Not null");
+    }
+
+    public boolean isNationClicked() {
+        return nationClicked;
+    }
+
+    public void setNationClicked(boolean nationClicked) {
+        this.nationClicked = nationClicked;
     }
 }

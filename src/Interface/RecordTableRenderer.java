@@ -29,6 +29,7 @@ public class RecordTableRenderer extends JTextArea implements TableCellRenderer 
         }
 
         setText(str);
+        //table.setRowHeight(this.getPreferredSize().height);
         return this;
     }
 }

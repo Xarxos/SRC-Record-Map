@@ -9,7 +9,7 @@ public class User {
 
     private String id;
 
-    private String name;
+    private String name = "N/A";
     private Role role;
 
     public User(String id) {

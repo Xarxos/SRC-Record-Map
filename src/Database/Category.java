@@ -132,6 +132,11 @@ public class Category {
         if(timingIndexes[timingMethod] != -1) {
             return runs.get(timingIndexes[timingMethod]);
         }
-        return null;
+        else {
+            Run noWR = new Run("-1", database);
+            noWR.setTimingMethod(Run.TimingMethod.values()[timingMethod]);
+            return noWR;
+        }
+        //return null;
     }
 }

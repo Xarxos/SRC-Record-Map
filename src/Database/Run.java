@@ -18,7 +18,7 @@ public class Run implements Comparable {
 
     private String comment;
 
-    private User runner;
+    private User runner = new User("-1");
     private boolean verified = false;
     private User verifier;
     private double pureTime;
@@ -231,6 +231,10 @@ public class Run implements Comparable {
         return timingMethod;
     }
 
+    public void setTimingMethod(TimingMethod timingMethod) {
+        this.timingMethod = timingMethod;
+    }
+
     public User getRunner() {
         return runner;
     }
@@ -240,8 +244,14 @@ public class Run implements Comparable {
     }
 
     public String[] getTimeString() {
+        String[] timeString = new String[4];
+        if(time[0]+time[1]+time[2]+time[3] == 0) {
+            timeString[0] = "";
+            timeString[1] = "";
+            timeString[2] = "N/A";
+            return timeString;
+        }
         if (timingMethod == TimingMethod.RTA_NS5 || timingMethod == TimingMethod.RTA_WS5) {
-            String[] timeString = new String[4];
             timeString[0] = time[0] + " hours";
             timeString[1] = time[1] + " minutes";
             timeString[2] = time[2] + " seconds";
@@ -254,7 +264,6 @@ public class Run implements Comparable {
             //return time[0] + " hours\n " + time[1] + " minutes \n " + time[2] + " seconds" + ms;
         }
         else if (timingMethod == TimingMethod.IGT || timingMethod == TimingMethod.IGT_WSS) {
-            String[] timeString = new String[4];
             timeString[0] = time[0] + " years";
             timeString[1] = time[1] + " months";
             timeString[2] = time[2] + " days";

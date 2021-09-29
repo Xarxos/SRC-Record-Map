@@ -5,17 +5,22 @@ import java.io.IOException;
 public class GUI {
     private final Panel panel;
     private RecordBox recordBox;
-    private JLabel nationLabel;
+    private JPanel nationLabel;
+    private JFrame frame;
 
     public GUI(Database database) {
-        JFrame frame = new JFrame("Map");
-        this.recordBox = new RecordBox();
+        frame = new JFrame("Map");
+        this.recordBox = new RecordBox(this);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         panel = new Panel();
-        nationLabel = new JLabel();
+        nationLabel = new JPanel();
+        nationLabel.setLayout(new BorderLayout());
+        nationLabel.add(new JLabel(), BorderLayout.CENTER);
+        nationLabel.setVisible(false);
         frame.setLayout(new BorderLayout());
-        frame.add(panel, BorderLayout.CENTER);
+        frame.add(panel, BorderLayout.NORTH);
+        frame.add(recordBox, BorderLayout.WEST);
         frame.setResizable(false);
         frame.pack();
         frame.setVisible(true);
@@ -37,20 +42,15 @@ public class GUI {
         return panel;
     }
 
-    public void showRecordBox(Category category) {
-        this.recordBox = new RecordBox();
-    }
-
-    public void hideRecordBox() {
-        //this.recordBox.setVisible(false);
-        //recordBox.cl
-    }
-
     public RecordBox getRecordBox() {
         return recordBox;
     }
 
-    public JLabel getNationLabel() {
+    public JPanel getNationLabel() {
         return nationLabel;
+    }
+
+    public JFrame getFrame() {
+        return frame;
     }
 }

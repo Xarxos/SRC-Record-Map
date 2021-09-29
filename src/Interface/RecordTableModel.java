@@ -3,7 +3,7 @@ import java.util.ArrayList;
 
 public class RecordTableModel extends AbstractTableModel {
     private ArrayList<Run> runs = new ArrayList<>();
-    private int rowCount;
+    private int rowCount = 4;
     private int columnCount = 3;
 
     @Override

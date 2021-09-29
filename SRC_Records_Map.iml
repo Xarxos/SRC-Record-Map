@@ -7,6 +7,8 @@
       <sourceFolder url="file://$MODULE_DIR$/src/Database" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Interface" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/images" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/images/achievements" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/images/flags" isTestSource="false" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

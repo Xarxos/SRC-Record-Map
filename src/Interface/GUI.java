@@ -5,7 +5,6 @@ import java.io.IOException;
 public class GUI {
     private final Panel panel;
     private RecordBox recordBox;
-    private JPanel nationLabel;
     private JFrame frame;
 
     public GUI(Database database) {
@@ -13,14 +12,21 @@ public class GUI {
         this.recordBox = new RecordBox(this);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+
+
         panel = new Panel();
-        nationLabel = new JPanel();
-        nationLabel.setLayout(new BorderLayout());
-        nationLabel.add(new JLabel(), BorderLayout.CENTER);
-        nationLabel.setVisible(false);
+
+        JTabbedPane tabbedPane = new JTabbedPane();
+
+        JPanel mapPanel = new JPanel();
+        mapPanel.setLayout(new BorderLayout());
+        mapPanel.add(panel, BorderLayout.SOUTH);
+        mapPanel.add(recordBox, BorderLayout.WEST);
+
+        tabbedPane.addTab("Map", mapPanel);
+
         frame.setLayout(new BorderLayout());
-        frame.add(panel, BorderLayout.NORTH);
-        frame.add(recordBox, BorderLayout.WEST);
+        frame.add(tabbedPane, BorderLayout.CENTER);
         frame.setResizable(false);
         frame.pack();
         frame.setVisible(true);
@@ -44,10 +50,6 @@ public class GUI {
 
     public RecordBox getRecordBox() {
         return recordBox;
-    }
-
-    public JPanel getNationLabel() {
-        return nationLabel;
     }
 
     public JFrame getFrame() {

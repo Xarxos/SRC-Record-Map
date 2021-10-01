@@ -26,6 +26,10 @@ public class Variable {
             }
         }
 
+        public String getId() {
+            return id;
+        }
+
         public String getLabel() {
             return label;
         }
@@ -45,14 +49,17 @@ public class Variable {
     }
 
     public void storeData(ArrayList<String> cleanedDataArray) {
+        //System.out.println(cleanedDataArray);
         int valueStartIndex = 0;
         int valueEndIndex = 0;
 
         for (int i = 0; i < cleanedDataArray.size(); i++) {
+            //System.out.println(cleanedDataArray.get(i));
             if (cleanedDataArray.get(i).compareTo("name") == 0) {
                 this.name = cleanedDataArray.get(i+1);
             }
-            else if (cleanedDataArray.get(i).compareTo("category") == 0) {
+            else if (cleanedDataArray.get(i).compareTo("category") == 0 && !cleanedDataArray.get(i+1).equals("uri")) {
+                //System.out.println(this.name + " | " + cleanedDataArray.get(i+1));
                 if (cleanedDataArray.get(i+1).contains("null")) {
                     category = null;
                 }
@@ -68,6 +75,7 @@ public class Variable {
                 valueStartIndex = i;
             }
         }
+        //System.out.println("END\n");
 
         storeValuesData(cleanedDataArray, valueStartIndex, valueEndIndex);
     }
@@ -113,5 +121,13 @@ public class Variable {
 
     public Value getValue(String valueId) {
         return values.get(valueId);
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public Map<String, Value> getValues() {
+        return values;
     }
 }

@@ -1,220 +1,213 @@
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
 public class RecordBox extends JPanel {
+    public class SubcategoryPanel extends JPanel {
+        private JTable table;
+        private RecordTableModel recordTableModel = new RecordTableModel();
+    }
+
     private GUI gui;
-    private RecordMap map;
     private Category category;
 
-    private JTable table;
-    private RecordTableModel recordTableModel = new RecordTableModel();
-
-    private JPanel recordPanel;
+    private JTabbedPane recordPanel = new JTabbedPane();
     private JPanel categoryPanel;
+
+    private ArrayList<SubcategoryPanel> subcategoryPanels = new ArrayList<>();
+
 
     private JLabel nation = new JLabel("Nation");
     private JLabel achievement = new JLabel("Achievement");
 
     public RecordBox(GUI gui) {
         this.gui = gui;
-        //this.map = map;
-        //this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        table = new JTable(recordTableModel);
-        table.setDefaultRenderer(String[].class, new RecordTableRenderer());
-        table.setRowHeight(65);
-
-        //this.setPreferredSize(new Dimension(1,1));
-        //this.setLayout(new WrapLayout());
-        //panel = new JPanel();
-        /*
-        textArea = new JTextArea();
-        textArea.setLineWrap(true);
-        textArea.setWrapStyleWord(true);
-        textArea.setEditable(false);
-
-         */
-        //scrollPane = new JScrollPane(table);
-        //scrollPane.setPreferredSize(table.getPreferredSize());
-
         this.setLayout(new BorderLayout());
 
-        recordPanel = new JPanel();
-        recordPanel.setLayout(new BorderLayout());
-        recordPanel.add(table.getTableHeader(), BorderLayout.NORTH);
-        recordPanel.add(table, BorderLayout.CENTER);
-/*
-        JPanel flagPanel = new JPanel();
-        JPanel nationPanel = new JPanel();
-        nationPanel.setLayout(new BorderLayout());
-        nationPanel.add(flagPanel, BorderLayout.WEST);
-        nationPanel.add(nation, BorderLayout.EAST);
-
-        JPanel iconPanel = new JPanel();
-        JPanel achievementPanel = new JPanel();
-        achievementPanel.setLayout(new BorderLayout());
-        achievementPanel.add(iconPanel, BorderLayout.WEST);
-        achievementPanel.add(achievement, BorderLayout.EAST);
-
- */
         nation.setFont(new Font("Serif", Font.BOLD, 34));
         achievement.setFont(new Font("Serif", Font.BOLD, 34));
-        /*
-        try {
-            nation.setIcon(new ImageIcon(ImageIO.read(getClass().getResource("/images/England.png"))));
-            achievement.setIcon(new ImageIcon(ImageIO.read(getClass().getResource("/images/Scotland.png"))));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-         */
 
         categoryPanel = new JPanel();
-        categoryPanel.setLayout(new BorderLayout());
-        categoryPanel.add(nation, BorderLayout.NORTH);
-        categoryPanel.add(achievement, BorderLayout.SOUTH);
+        categoryPanel.setLayout(new GridLayout(2,1));
+        categoryPanel.add(nation);
+        categoryPanel.add(achievement);
 
         this.add(categoryPanel, BorderLayout.EAST);
         this.add(recordPanel, BorderLayout.WEST);
-
-        //recordPanel.getPreferredSize().height + table.getTableHeader().getPreferredSize().height
 
         try {
             clearCategory();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        pack();
 
-        //this.setMinimumSize(new Dimension(250,100));
+        Border border = BorderFactory.createLineBorder(Color.BLACK);
+        nation.setBorder(border);
+        achievement.setBorder(border);
+
         this.setVisible(true);
     }
 
-    public void setCategory(Category category) {
+    private SubcategoryPanel setupSubcategoryPanel() {
+        SubcategoryPanel panel = new SubcategoryPanel();
+
+        panel.table = new JTable(panel.recordTableModel);
+        panel.table.setDefaultRenderer(String[].class, new RecordTableRenderer());
+        panel.table.setRowHeight(65);
+
+        panel.setLayout(new BorderLayout());
+
+        panel.add(panel.table.getTableHeader(), BorderLayout.NORTH);
+        panel.add(panel.table, BorderLayout.CENTER);
+
+        return panel;
+    }
+
+    public void setCategory(Category category) throws IOException {
+        clearCategory();
         this.category = category;
-        //this.setTitle(category.getName());
-        addRunsToTable();
-        //changeText();
+        if(category.getSubcategories().isEmpty()) {
+            subcategoryPanels.add(setupSubcategoryPanel());
+            addRunsToTable(0, null);
+        }
+        else {
+            for(int i = 0; i < category.getSubcategories().size(); i++) {
+                subcategoryPanels.add(setupSubcategoryPanel());
+                addRunsToTable(i, category.getSubcategories().get(i));
+            }
+        }
+
     }
 
     public void clearCategory() throws IOException {
         this.category = null;
-        recordTableModel.clearRuns();
+        subcategoryPanels.clear();
+        recordPanel.removeAll();
 
-        for(int i = 0; i < 4; i++) {
+        SubcategoryPanel panel1 = setupSubcategoryPanel();
+        for(int i = 0; i < 3; i+=2) {
             Run noWR = new Run("-1", null);
             noWR.setTimingMethod(Run.TimingMethod.values()[i]);
-            recordTableModel.addRun(noWR);
+            panel1.recordTableModel.addRun(noWR);
         }
+        panel1.recordTableModel.setRowCount(2);
+        panel1.recordTableModel.fireTableDataChanged();
+        subcategoryPanels.add(panel1);
 
-        recordTableModel.fireTableDataChanged();
+        recordPanel.addTab(" ", panel1);
 
-        nation.setIcon(new ImageIcon(ImageIO.read(getClass().getResource("/images/flags/Blank.png"))));
-        achievement.setIcon(new ImageIcon(ImageIO.read(getClass().getResource("/images/achievements/Blank.png"))));
-        nation.setText("--------------------");
-        achievement.setText("--------------------");
+        BufferedImage image = ImageIO.read(getClass().getResource("/images/flags/Blank.png"));
+        nation.setIcon(new ImageIcon(image));
+
+        image = ImageIO.read(getClass().getResource("/images/achievements/Blank.png"));
+        achievement.setIcon(new ImageIcon(image));
+
+        nation.setText("                              ");
+        achievement.setText("                              ");
         pack();
     }
 
-    private void addRunsToTable() {
-        recordTableModel.clearRuns();
+    private void addRunsToTable(int tabIndex, Variable.Value subCat) {
+        SubcategoryPanel tab = subcategoryPanels.get(tabIndex);
+
+        tab.recordTableModel.clearRuns();
         int numWRs = 0;
 
+        if(subCat == null) {
+            recordPanel.addTab(" ", tab);
+        }
+        else {
+            recordPanel.addTab(subCat.getLabel(), tab);
+        }
+
         for(int i = 0; i < 4; i++) {
-            Run WR_Run = category.getWR(i);
+            Run WR_Run = null;
+            if(subCat == null) {
+                WR_Run = category.getWR(" ", i);
+            }
+            else {
+                WR_Run = category.getWR(subCat.getId(), i);
+            }
 
             if(WR_Run != null) {
                 numWRs++;
-                recordTableModel.addRun(WR_Run);
+                tab.recordTableModel.addRun(WR_Run);
             }
         }
-        //recordTableModel.setRowCount(numWRs);
 
-        recordTableModel.fireTableDataChanged();
-        //table.setPreferredSize(new Dimension(table.getPreferredSize().width, table.getRowCount() * table.getRowHeight()));
-        //scrollPane.setPreferredSize(new Dimension(table.getPreferredSize().width, table.getPreferredSize().height + table.getTableHeader().getPreferredSize().height));
-        //this.setPreferredSize(new Dimension(table.getPreferredSize().width, table.getPreferredSize().height + table.getTableHeader().getPreferredSize().height));
-        //this.pack();
-    }
+        tab.recordTableModel.setRowCount(numWRs);
+        tab.recordTableModel.fireTableDataChanged();
 
-    private void changeText() {
-        Run[] WR_Runs = new Run[4];
-        String[] WR_Texts = new String[4];
-        String finalText = "";
-
-        for(int i = 0; i < 4; i++) {
-            WR_Runs[i] = category.getWR(i);
-            //System.out.println("WR: " + category.getWR(i));
-
-            if(WR_Runs[i] != null) {
-                int time[] = WR_Runs[i].getTime();
-                String rta = time[0] + "h / " + time[1] + "m / " + time[2] + "s / " + time[3] + "ms";
-                String igt = time[0] + "y / " + time[1] + "m / " + time[2] + "d";
-
-                switch(i) {
-                    case 0:
-                        WR_Texts[i] = "RTA NS5: " + rta;
-                        //System.out.println("RTA NS5: " + rta);
-                        break;
-                    case 1:
-                        WR_Texts[i] = "RTA WS5: " + rta;
-                        //System.out.println("RTA WS5: " + rta);
-                        break;
-                    case 2:
-                        WR_Texts[i] = "IGT NSS: " + igt;
-                        //System.out.println("IGT NSS: " + igt);
-                        break;
-                    case 3:
-                        WR_Texts[i] = "IGT WSS: " + igt;
-                        //System.out.println("IGT WSS: " + igt);
-                }
-                WR_Texts[i] += "\n" + WR_Runs[i].getRunner().getName();
-                finalText += WR_Texts[i] + "\n";
-            }
-        }
-        //System.out.println("Final Text: " + finalText);
-        //textArea.setText(finalText);
-        //this.pack();
+        this.pack();
     }
 
     public void setNation(String name, String flagFilePath) throws IOException {
-        nation.setIcon(new ImageIcon(ImageIO.read(getClass().getResource(flagFilePath))));
+        BufferedImage image = ImageIO.read(getClass().getResource(flagFilePath));
+        nation.setIcon(new ImageIcon(image));
         nation.setText(name);
         pack();
     }
 
     public void setAchievement(String name, String iconFilePath) throws IOException {
         if(name != null) {
-            achievement.setIcon(new ImageIcon(ImageIO.read(getClass().getResource(iconFilePath))));
+            BufferedImage image = ImageIO.read(getClass().getResource(iconFilePath));
+            achievement.setIcon(new ImageIcon(image));
             achievement.setText(name);
             pack();
         }
     }
 
     public void pack() {
-        //nation.setPreferredSize(new Dimension(nation.getPreferredSize().width, nation.getIcon().getIconHeight()));
-        //achievement.setPreferredSize(new Dimension(achievement.getPreferredSize().width, achievement.getIcon().getIconHeight()));
-
         int biggerX = nation.getPreferredSize().width > achievement.getPreferredSize().width ? nation.getPreferredSize().width : achievement.getPreferredSize().width;
         int biggerY = nation.getPreferredSize().height + achievement.getPreferredSize().height;
-        categoryPanel.setPreferredSize(new Dimension(biggerX, biggerY));
+        //categoryPanel.setPreferredSize(new Dimension(biggerX, biggerY));
+        categoryPanel.setMaximumSize(new Dimension(biggerX, biggerY));
 
 
         //table.setPreferredSize(new Dimension(table.getPreferredSize().width, table.getRowCount() * table.getRowHeight()));
 
-        biggerX = table.getPreferredSize().width;
-        biggerY = table.getPreferredSize().height + table.getTableHeader().getPreferredSize().height;
-        recordPanel.setPreferredSize(new Dimension(biggerX, biggerY));
+        for(SubcategoryPanel subCatPanel : subcategoryPanels) {
+            int tableWidth = subCatPanel.table.getPreferredSize().width;
+            biggerX = biggerX < tableWidth ? tableWidth : biggerX;
+            int tableHeight = subCatPanel.table.getRowCount() * subCatPanel.table.getRowHeight();
+            biggerY = biggerY < tableHeight ? tableHeight : biggerY;
+        }
+        recordPanel.setMaximumSize(new Dimension(biggerX, biggerY));
 
-        biggerX = categoryPanel.getPreferredSize().width + recordPanel.getPreferredSize().width;
-        biggerY = categoryPanel.getPreferredSize().height > recordPanel.getPreferredSize().height ? categoryPanel.getPreferredSize().width : recordPanel.getPreferredSize().width;
-        this.setPreferredSize(new Dimension(biggerX, biggerY));
+        biggerX = categoryPanel.getMaximumSize().width + recordPanel.getMaximumSize().width;
+        biggerY = categoryPanel.getMaximumSize().height > recordPanel.getMaximumSize().height ? categoryPanel.getMaximumSize().width : recordPanel.getMaximumSize().width;
+        this.setMaximumSize(new Dimension(biggerX, biggerY));
         gui.getFrame().pack();
         //gui.getFrame().setPreferredSize(new Dimension(gui.getFrame().getPreferredSize().width, gui.getFrame().getPreferredSize().height + 20));
+    }
+
+    private BufferedImage scaleImage(BufferedImage image, double scaleFactor) {
+        int w = image.getWidth();
+        int h = image.getHeight();
+        //System.out.println(w + " - " + h);
+        BufferedImage scaledSprite = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        AffineTransform at = new AffineTransform();
+        at.scale(scaleFactor, scaleFactor);
+        AffineTransformOp scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
+        scaledSprite = scaleOp.filter(image, scaledSprite);
+        //System.out.println(scaledSprite.getWidth() + " - " + scaledSprite.getHeight());
+
+        return scaledSprite;
+    }
+
+    public JLabel getNation() {
+        return nation;
+    }
+
+    public JLabel getAchievement() {
+        return achievement;
     }
 }

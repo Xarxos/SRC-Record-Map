@@ -77,6 +77,14 @@ public class Database {
     }
 
     public void addVariable(String varId) {
+        /*
+        System.out.println(varId + " | " + variables.containsKey(varId));
+        for(String varsId : variables.keySet()) {
+            System.out.println(varsId);
+        }
+
+         */
+        //System.out.println("\n");
         if (!variables.containsKey(varId)) {
             Variable var = new Variable(varId, this);
             ArrayList<String> cleanedDataArray = parseItem(variableURL + varId);
@@ -116,8 +124,9 @@ public class Database {
             }
             else {
                 Category category = new Category(cleanedDataArray.get(0), this, game);
-                category.storeData(cleanedDataArray);
                 categories.put(cleanedDataArray.get(0), category);
+                category.storeData(cleanedDataArray);
+
                 cats.add(category);
             }
         }
@@ -251,8 +260,16 @@ public class Database {
 
     public void printCategories() {
         for (Category cat : categories.values() ) {
-            cat.printName();
-            cat.printRuns();
+            if(cat.getName().equals("Form Roman Empire")) {
+                cat.printAll("");
+            }
+
+            //cat.printNameAndID();
+            //cat.printRuns();
         }
+    }
+
+    public Map<String, Variable> getVariables() {
+        return variables;
     }
 }

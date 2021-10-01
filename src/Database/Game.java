@@ -63,7 +63,7 @@ public class Game {
         }
         for (Category cat : categories) {
             System.out.println("Category:\n---------");
-            cat.printAll();
+            cat.printAll("\t");
         }
     }
 }

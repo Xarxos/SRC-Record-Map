@@ -130,12 +130,7 @@ public class Run implements Comparable {
          */
     }
 
-    public void printAll(int numPrefixTabs) {
-        String prefixTabs = "";
-        for (int i = 0; i < numPrefixTabs; i++) {
-            prefixTabs += "\t";
-        }
-
+    public void printAll(String prefixTabs) {
         System.out.println(prefixTabs + "id: " + id);
         System.out.println(prefixTabs + "runner: " + runner.getName());
         printTime(prefixTabs);
@@ -274,6 +269,10 @@ public class Run implements Comparable {
         else {
             return null;
         }
+    }
+
+    public Map<String, String> getVariableValues() {
+        return variableValues;
     }
 }
 

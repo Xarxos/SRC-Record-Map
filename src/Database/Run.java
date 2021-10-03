@@ -106,6 +106,12 @@ public class Run implements Comparable {
                 }
             }
         }
+        if(runner.getName().equals("Lambdax.x")) {
+            //for (int i = 0; i < cleanedDataArray.size() - 2; i++) {
+            //    System.out.println(cleanedDataArray.get(i));
+            //}
+            //printAll("");
+        }
     }
 
     private void checkTimingMethod(String varId, String valueId) {
@@ -188,8 +194,11 @@ public class Run implements Comparable {
 
     @Override
     public int compareTo(Object compRun) {
-        //System.out.println("runner: " + runner.getName());
-        //printTime("\t");
+        if(runner.getName().equals("Lambdax.x") || runner.getName().equals("Sayuza1444")) {
+            //System.out.println("runner: " + runner.getName());
+            //printTime("\t");
+        }
+
         //System.out.println("time: " + time[0] + "h / " + time[1] + "m / " + time[2] + "s / " + time[3] + "ms");
         int methodThis = 0;
         int methodComp = 0;
@@ -197,13 +206,20 @@ public class Run implements Comparable {
         double valueComp;
 
         if(this.verified) {
+            if(runner.getName().equals("Lambdax.x") || runner.getName().equals("Sayuza1444")) {
+                //System.out.println("Verified!?");
+            }
             if(this.timingMethod != null) {
                 methodThis = this.timingMethod.ordinal() + 1;
             }
             valueThis = (methodThis + this.pureTime);
         }
         else {
-            valueThis = Double.MAX_VALUE;
+            valueThis = 100000d;
+            if(runner.getName().equals("Lambdax.x") || runner.getName().equals("Sayuza1444")) {
+                //System.out.println("Naaaaaah...!");
+                //System.out.println(valueThis);
+            }
         }
 
         if(((Run)compRun).verified) {
@@ -213,7 +229,10 @@ public class Run implements Comparable {
             valueComp = (methodComp + ((Run)compRun).pureTime);
         }
         else {
-            valueComp = Double.MAX_VALUE;
+            valueComp = 100000d;
+        }
+        if(runner.getName().equals("Lambdax.x") || runner.getName().equals("Sayuza1444")) {
+            //System.out.println(valueThis - valueComp);
         }
 
         //System.out.println("\t" + (methodThis + this.pureTime));
@@ -252,7 +271,7 @@ public class Run implements Comparable {
             timeString[2] = time[2] + " seconds";
 
             if (time[3] > 0) {
-                timeString[3] = time[3] + " milliseconds";
+                timeString[3] = time[3] + " millis";
             }
 
             return timeString;
@@ -273,6 +292,10 @@ public class Run implements Comparable {
 
     public Map<String, String> getVariableValues() {
         return variableValues;
+    }
+
+    public boolean isVerified() {
+        return verified;
     }
 }
 

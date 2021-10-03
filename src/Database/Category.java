@@ -42,6 +42,12 @@ public class Category {
                 allRuns = database.parseRuns(cleanedDataArray.get(i+2));
             }
         }
+        for(int i = 0; i < allRuns.size(); i++) {
+            if(!allRuns.get(i).isVerified()) {
+                allRuns.remove(i);
+                i--;
+            }
+        }
         for(Variable var : database.getVariables().values()) {
             if(this.name.equals("Form Roman Empire")) {
                 //System.out.println(this.name + " | " + var.getName() + " | " + var.getId() + " | " + var.getCategory().getName());
@@ -87,6 +93,13 @@ public class Category {
         }
         for(String subCat : runs.keySet()) {
             Collections.sort(runs.get(subCat));
+            if(id.equals("vdoo9wyd")) {
+                for(Run run : runs.get(subCat)) {
+                    run.printAll("");
+                    System.out.println("");
+                }
+
+            }
             storeTimingIndexes(runs.get(subCat), subCat);
         }
     }
@@ -193,6 +206,9 @@ public class Category {
         int timingIndex = timingIndexes.get(subCat).get(timingMethod);
 
         if(timingIndex != -1) {
+            if(this.id.equals("vdoo9wyd") && timingMethod == 1) {
+                return null;
+            }
             return runs.get(subCat).get(timingIndex);
         }
         else {

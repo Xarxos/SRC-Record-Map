@@ -20,7 +20,7 @@ public class Nation {
         this.name = name;
         this.achievement = achievement;
         this.database = database;
-        this.onMapImage = ImageIO.read(getClass().getResource("/images/" + name + ".png"));
+        this.onMapImage = ImageIO.read(getClass().getResource("/images/nations/" + name + ".png"));
         this.flagFilePath = "/images/flags/" + name + ".png";
         if(achievement != null) {
             this.achievementIconFilePath = "/images/achievements/" + achievement + ".png";

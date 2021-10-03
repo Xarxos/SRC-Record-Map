@@ -127,23 +127,34 @@ public class RecordBox extends JPanel {
         else {
             recordPanel.addTab(subCat.getLabel(), tab);
         }
+        Run[] WR_Run = new Run[4];
 
         for(int i = 0; i < 4; i++) {
-            Run WR_Run = null;
+
             if(subCat == null) {
-                WR_Run = category.getWR(" ", i);
+                WR_Run[i] = category.getWR(" ", i);
             }
             else {
-                WR_Run = category.getWR(subCat.getId(), i);
+                WR_Run[i] = category.getWR(subCat.getId(), i);
             }
 
-            if(WR_Run != null) {
+            if(WR_Run[i] != null) {
                 numWRs++;
-                tab.recordTableModel.addRun(WR_Run);
+                tab.recordTableModel.addRun(WR_Run[i]);
             }
         }
+        if(WR_Run[0] == null && WR_Run[1] == null) {
+            Run noWR = new Run("-1", null);
+            noWR.setTimingMethod(Run.TimingMethod.values()[0]);
+            tab.recordTableModel.addRun(noWR);
+        }
+        if(WR_Run[2] == null && WR_Run[3] == null) {
+            Run noWR = new Run("-1", null);
+            noWR.setTimingMethod(Run.TimingMethod.values()[2]);
+            tab.recordTableModel.addRun(noWR);
+        }
 
-        tab.recordTableModel.setRowCount(numWRs);
+        tab.recordTableModel.setRowCount(2);
         tab.recordTableModel.fireTableDataChanged();
 
         this.pack();

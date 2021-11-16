@@ -93,13 +93,6 @@ public class Category {
         }
         for(String subCat : runs.keySet()) {
             Collections.sort(runs.get(subCat));
-            if(id.equals("vdoo9wyd")) {
-                for(Run run : runs.get(subCat)) {
-                    run.printAll("");
-                    System.out.println("");
-                }
-
-            }
             storeTimingIndexes(runs.get(subCat), subCat);
         }
     }

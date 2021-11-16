@@ -10,8 +10,18 @@
       <sourceFolder url="file://$MODULE_DIR$/src/images/achievements" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/images/flags" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/images/nations" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/RawData" isTestSource="false" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/json-simple-1.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>

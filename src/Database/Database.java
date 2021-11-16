@@ -1,5 +1,10 @@
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
 import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -25,6 +30,26 @@ public class Database {
     public void addGame(String gameId) {
         if (!games.containsKey(gameId)) {
             Game game = new Game(gameId, this);
+
+            Object obj = null;
+            try {
+                obj = new JSONParser().parse(new FileReader("C:\\Users\\ludvi\\IdeaProjects\\PdxSaveMove\\src\\RawData\\" + gameId + ".txt"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            // typecasting obj to JSONObject
+            JSONObject jo = (JSONObject) obj;
+
+            // getting firstName and lastName
+            String firstName = (String) jo.get("id");
+            String lastName = (String) jo.get("abbreviation");
+
+            System.out.println(firstName);
+            System.out.println(lastName);
+
             ArrayList<String> cleanedDataArray = parseItem(gameURL + gameId);
             game.storeData(cleanedDataArray);
             games.put(gameId, game);

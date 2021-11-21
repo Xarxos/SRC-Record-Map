@@ -99,7 +99,7 @@ public class Run implements Comparable {
                     }
 
                      */
-                    database.addVariable(cleanedDataArray.get(j));
+                    //database.addVariable(cleanedDataArray.get(j));
                     variableValues.put(cleanedDataArray.get(j), cleanedDataArray.get(j+1));
 
                     checkTimingMethod(cleanedDataArray.get(j), cleanedDataArray.get(j+1));
@@ -177,7 +177,7 @@ public class Run implements Comparable {
 
     }
 
-    private void storeTime(double seconds) {
+    public void storeTime(double seconds) {
         int intSeconds = (int)seconds;
         seconds -= (double)intSeconds;
 
@@ -294,8 +294,36 @@ public class Run implements Comparable {
         return variableValues;
     }
 
+    public void addVariableValue(String varId, String valId) {
+        variableValues.put(varId, valId);
+    }
+
     public boolean isVerified() {
         return verified;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
+    public void setGame(Game game) {
+        this.game = game;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public void setRunner(User runner) {
+        this.runner = runner;
+    }
+
+    public void setVerified(boolean verified) {
+        this.verified = verified;
+    }
+
+    public void setVerifier(User verifier) {
+        this.verifier = verifier;
     }
 }
 

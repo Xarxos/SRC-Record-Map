@@ -1,3 +1,9 @@
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
+import java.io.FileReader;
+import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,8 +28,16 @@ public class Category {
         this.id = id;
         this.database = database;
         this.game = game;
+        this.subcategories.put(" ", new ArrayList<>());
     }
 
+    public void storeData(JSONObject categoryObject) {
+        this.name = (String)categoryObject.get("name");
+        this.rules = (String)categoryObject.get("rules");
+        this.misc = (boolean)categoryObject.get("miscellaneous");
+    }
+
+/*
     public void storeData(ArrayList<String> cleanedDataArray) {
         ArrayList<Run> allRuns = null;
         for (int i = 0; i < cleanedDataArray.size(); i++) {
@@ -83,6 +97,8 @@ public class Category {
         }
     }
 
+ */
+
     private void divideRunsBySubCat(ArrayList<Run> allRuns) {
         for(Run run : allRuns) {
             for(String varId : run.getVariableValues().keySet()) {
@@ -120,6 +136,7 @@ public class Category {
         else {
             System.out.println("false");
         }
+
         for(ArrayList<Variable.Value> subCats : subcategories.values()) {
             if(subCats.get(0) != null) {
                 for(Variable.Value subCat : subCats) {
@@ -139,6 +156,8 @@ public class Category {
 
         }
 
+
+
     }
 
     public void printNameAndID() {
@@ -156,12 +175,13 @@ public class Category {
             }
         }
     }
-/*
-    public void addSubcategory(Category subcategory) {
-        subcategories.add(subcategory);
-    }
 
- */
+    public void addSubcategory(Variable subCatVariable) {
+        if(subcategories.containsKey(" ")) {
+            subcategories.remove(" ");
+        }
+        subcategories.put(subCatVariable.getId(), (ArrayList)subCatVariable.getValues().values());
+    }
 
     public String getId() {
         return id;
@@ -212,6 +232,10 @@ public class Category {
         //return null;
     }
 
+    public void addRun(Run run, String subCatId) {
+        this.runs.get(subCatId).add(run);
+    }
+
     @Override
     public boolean equals(Object o) {
         return ((Category)o).id.equals(this.id);
@@ -222,5 +246,13 @@ public class Category {
             return subCat;
         }
         return null;
+    }
+
+    public boolean isSubCatVariable(String varId) {
+        return subcategories.containsKey(varId);
+    }
+
+    public boolean hasSubCategories() {
+        return subcategories.size() > 1;
     }
 }

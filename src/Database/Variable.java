@@ -1,3 +1,5 @@
+import org.json.simple.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -119,6 +121,10 @@ public class Variable {
         return name;
     }
 
+    public boolean isSubcategory() {
+        return subcategory;
+    }
+
     public Value getValue(String valueId) {
         return values.get(valueId);
     }
@@ -129,5 +135,29 @@ public class Variable {
 
     public Map<String, Value> getValues() {
         return values;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
+    public void setSubcategory(boolean subcategory) {
+        this.subcategory = subcategory;
+    }
+
+    public void addValues(Map valueObjects) {
+        for(Object valueIdObj : valueObjects.keySet()) {
+            String valueId = (String) valueIdObj;
+            Value val = new Value();
+            val.id = valueId;
+            val.label = (String) ((JSONObject)valueObjects.get(valueId)).get("label");
+            val.rules = (String) ((JSONObject)valueObjects.get(valueId)).get("rules");
+            val.misc = (boolean)((JSONObject)((JSONObject)valueObjects.get(valueId)).get("flags")).get("miscellaneous");
+            values.put((String) valueId, val);
+        }
     }
 }

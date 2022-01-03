@@ -36,8 +36,9 @@ public class GameParser {
         }
 
         JSONObject jo = (JSONObject) obj;
+        JSONObject data = (JSONObject) jo.get("data");
 
-        Map mods = (Map)jo.get("moderators");
+        Map mods = (Map)data.get("moderators");
         for (Object modId : mods.keySet()) {
             parse("users", (String)modId, null);
         }
@@ -71,7 +72,8 @@ public class GameParser {
             con = (HttpsURLConnection) url.openConnection();
             con.setRequestMethod("GET");
 
-            writeToFile(con, fileName, urlNoOffset, 0, 0);
+            //writeToFile(con, fileName, urlNoOffset, 0, 0);
+            writeToFile2(con, fileName);
 
         } catch (IOException | ParseException e) {
             e.printStackTrace();
@@ -84,20 +86,93 @@ public class GameParser {
         HttpsURLConnection con = null;
 
         try {
-            String urlNoOffset = baseURL + "runs?max=" + Integer.toString(P_MAX) + "&game=" + gameId + "&offset=";
-            url = new URL(urlNoOffset + 0);
-            System.out.println(urlNoOffset + 0);
-            String fileName = "games/" + gameId + "_runs";
+            String nextURL = baseURL + "runs?max=" + Integer.toString(P_MAX) + "&game=" + gameId;
+            int page = 0;
+            while(nextURL != null) {
+                url = new URL(nextURL);
+                String fileName = "games/" + gameId + "_runs_" + page;
 
-            con = (HttpsURLConnection) url.openConnection();
-            con.setRequestMethod("GET");
+                con = (HttpsURLConnection) url.openConnection();
+                con.setRequestMethod("GET");
 
-            writeToFile(con, fileName, urlNoOffset, 0, 0);
+                //writeToFile(con, fileName, urlNoOffset, 0, 0);
 
+                nextURL = writeToFile2(con, fileName);
+                page++;
+            }
         } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
         con.disconnect();
+    }
+
+    private String writeToFile2(HttpsURLConnection con, String fileName) throws IOException, ParseException {
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader(con.getInputStream()));
+
+        File gameFile = new File("src/RawData/" + fileName + ".txt");
+        gameFile.createNewFile();
+        FileWriter writer = new FileWriter("src/RawData/" + fileName + ".txt", true);
+
+        File gameFile2 = new File("src/RawData/" + fileName + "_formatted.txt");
+        gameFile2.createNewFile();
+        FileWriter writer2 = new FileWriter("src/RawData/" + fileName + "_formatted.txt", true);
+
+
+        String inputLine = in.readLine();
+
+        writer.write(formatString(inputLine));
+        writer2.write(inputLine);
+        writer.close();
+        writer2.close();
+
+        JSONObject page = (JSONObject) new JSONParser().parse(inputLine);
+        JSONObject pagination = (JSONObject)page.get("pagination");
+
+        String nextURL = null;
+        if(pagination != null && (long)pagination.get("size") == P_MAX) {
+            JSONArray links = (JSONArray) pagination.get("links");
+            nextURL = (String) ((JSONObject)links.get(links.size()-1)).get("uri");
+        }
+
+        return nextURL;
+    }
+
+    private String formatString(String str) {
+        //System.out.println(str);
+        //ArrayList<Character> charArray = new ArrayList<>();
+        String formatStr = "";
+        int tabCount = 0;
+        for(int i = 0; i < str.length()-1; i++) {
+            //System.out.println(str.substring(i,i+1));
+            formatStr = formatStr.concat(str.substring(i,i+1));
+            //System.out.println(formatStr);
+            //charArray.add(str.charAt(i));
+            if(str.charAt(i+1) == '}') {
+                //charArray.add('\n');
+                formatStr = formatStr.concat("\n");
+                tabCount--;
+                for(int t = 0; t < tabCount; t++) {
+                    formatStr = formatStr.concat("\t");
+                }
+            }
+            else if(str.charAt(i) == ',') {
+                formatStr = formatStr.concat("\n");
+                for(int t = 0; t < tabCount; t++) {
+                    formatStr = formatStr.concat("\t");
+                }
+            }
+            else if(str.charAt(i) == '{') {
+                formatStr = formatStr.concat("\n");
+                tabCount++;
+                for(int t = 0; t < tabCount; t++) {
+                    formatStr = formatStr.concat("\t");
+                }
+            }
+        }
+        formatStr = formatStr.concat("}");
+        //System.out.println(formatStr);
+        return formatStr;
     }
 
     private void writeToFile(HttpsURLConnection con, String fileName, String urlNoOffset, int urlOffset, int depth) throws IOException, ParseException {

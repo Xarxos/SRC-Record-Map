@@ -121,8 +121,8 @@ public class GameParser {
 
         String inputLine = in.readLine();
 
-        writer.write(formatString(inputLine));
-        writer2.write(inputLine);
+        writer.write(inputLine);
+        writer2.write(formatString(inputLine));
         writer.close();
         writer2.close();
 

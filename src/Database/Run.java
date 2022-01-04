@@ -152,6 +152,7 @@ public class Run implements Comparable {
             Variable var = database.getVariable(varId);
             System.out.println(prefixTabs + var.getName() + ": " + var.getValue(variableValues.get(varId)).getLabel());
         }
+        System.out.println("");
     }
 
     public void printTime(String prefixTabs) {

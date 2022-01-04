@@ -62,7 +62,7 @@ public class User {
         System.out.println("id: " + id);
         System.out.println("name: " + name);
 
-        System.out.print("role: " + role);
+        System.out.println("role: " + role);
         /*
         if (role == Role.Mod) {
             System.out.println("moderator");
@@ -72,6 +72,7 @@ public class User {
         }
 
          */
+        System.out.println("");
     }
 
     public String getId() {

@@ -160,7 +160,11 @@ public class Database {
 
             run.setGame(games.get((String)runObject.get("game")));
             run.setComment((String)runObject.get("comment"));
-            run.setRunner(users.get((String)((JSONObject)((JSONArray)runObject.get("players")).get(0)).get("id")));
+            String runnerId = (String)((JSONObject)((JSONArray)runObject.get("players")).get(0)).get("id");
+            if(!users.containsKey(runnerId)) {
+                addUser(runnerId);
+            }
+            run.setRunner(users.get(runnerId));
             Object primaryT = ((JSONObject)runObject.get("times")).get("primary_t");
             Long l = 1l;
             if(primaryT.getClass() == l.getClass()) {
@@ -173,15 +177,13 @@ public class Database {
 
             JSONObject status = (JSONObject)runObject.get("status");
             run.setVerified(((String)status.get("status")).equals("verified"));
-            String verifierId = (String)runObject.get("examiner");
-            User verifier = null;
-            if(users.containsKey(verifierId)) {
-                verifier = users.get(verifierId);
+            if(!((String)status.get("status")).equals("new")) {
+                String verifierId = (String)status.get("examiner");
+                if(!users.containsKey(verifierId)) {
+                    addUser(verifierId);
+                }
+                run.setVerifier(users.get(verifierId));
             }
-            else {
-                addUser(verifierId);
-            }
-            run.setVerifier(verifier);
 
             String categoryId = (String)runObject.get("category");
             if(((String)runObject.get("level") != null)) {

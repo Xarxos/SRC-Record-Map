@@ -29,6 +29,7 @@ public class Category {
         this.database = database;
         this.game = game;
         this.subcategories.put(" ", new ArrayList<>());
+        this.subcategories.get(" ").add(null);
         this.runs.put(" ", new ArrayList<>());
     }
 
@@ -143,22 +144,19 @@ public class Category {
                 for(Variable.Value subCat : subCats) {
                     System.out.println(prefixTabs + "Subcategory: " + subCat.getLabel());
                     for (Run run : runs.get(subCat.getId())) {
-                        System.out.println(prefixTabs + "\tRun:\n----");
+                        System.out.println(prefixTabs + "\tRun:\n" + prefixTabs +"\t----");
                         run.printAll(prefixTabs + "\t\t");
                     }
                 }
             }
             else {
                 for (Run run : runs.get(" ")) {
-                    System.out.println(prefixTabs + "Run:\n----");
+                    System.out.println(prefixTabs + "Run:\n" + prefixTabs +"----");
                     run.printAll(prefixTabs + "\t");
                 }
             }
-
         }
-
-
-
+        System.out.println("");
     }
 
     public void printNameAndID() {

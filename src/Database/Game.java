@@ -94,6 +94,7 @@ public class Game {
         for (User mod : moderators) {
             System.out.println("moderator:\n----------");
             mod.printAll();
+            System.out.println("----------");
         }
         for (String supMod : superModerators) {
             System.out.println("super-moderator: " + supMod);
@@ -102,6 +103,7 @@ public class Game {
             System.out.println("Category:\n---------");
             cat.printAll("\t");
         }
+        System.out.println("");
     }
 
     public void setName(String name) {

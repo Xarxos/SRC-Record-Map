@@ -26,6 +26,7 @@ public class Variable {
             else {
                 System.out.println("no");
             }
+            System.out.println("");
         }
 
         public String getId() {
@@ -111,6 +112,7 @@ public class Variable {
         for (Value val : values.values()) {
             val.printAll();
         }
+        System.out.println("");
     }
 
     public String getId() {

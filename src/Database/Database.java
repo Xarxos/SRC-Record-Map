@@ -4,10 +4,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import javax.net.ssl.HttpsURLConnection;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,14 +43,21 @@ public class Database {
             JSONArray categoryArray = null;
             JSONArray levelArray = null;
             JSONArray variableArray = null;
-            JSONArray runArray = null;
+            ArrayList<JSONArray> runArrays = new ArrayList<>();
+            //JSONArray runArray = null;
             try {
                 String gameFilePath = baseFilePath + "games\\" + gameId;
-                gameObject = (JSONObject) (new JSONParser().parse(new FileReader(gameFilePath + ".txt")));
-                categoryArray = (JSONArray) (new JSONParser().parse(new FileReader(gameFilePath + "_categories.txt")));
-                levelArray = (JSONArray) (new JSONParser().parse(new FileReader(gameFilePath + "_levels.txt")));
-                variableArray = (JSONArray) (new JSONParser().parse(new FileReader(gameFilePath + "_variables.txt")));
-                runArray = (JSONArray) (new JSONParser().parse(new FileReader(gameFilePath + "_runs.txt")));
+                gameObject = (JSONObject) ((JSONObject) (new JSONParser().parse(new FileReader(gameFilePath + ".txt")))).get("data");
+                categoryArray = (JSONArray) ((JSONObject) (new JSONParser().parse(new FileReader(gameFilePath + "_categories.txt")))).get("data");
+                levelArray = (JSONArray) ((JSONObject) (new JSONParser().parse(new FileReader(gameFilePath + "_levels.txt")))).get("data");
+                variableArray = (JSONArray) ((JSONObject) (new JSONParser().parse(new FileReader(gameFilePath + "_variables.txt")))).get("data");
+                Integer i = 0;
+                File runFile = null;
+                while((runFile = new File(gameFilePath + "_runs_" + i.toString() + ".txt")).exists()) {
+                    runArrays.add((JSONArray) ((JSONObject) (new JSONParser().parse(new FileReader(gameFilePath + "_runs_" + i.toString() + ".txt")))).get("data"));
+                    i++;
+                }
+                //runArray = (JSONArray) ((JSONObject) (new JSONParser().parse(new FileReader(gameFilePath + "_runs.txt")))).get("data");
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (ParseException e) {
@@ -84,9 +88,12 @@ public class Database {
                 addVariable((JSONObject) var);
             }
 
-            for (Object run : runArray) {
-                addRun((JSONObject) run);
+            for (JSONArray runArray : runArrays) {
+                for (Object run : runArray) {
+                    addRun((JSONObject) run);
+                }
             }
+
 
             //game.storeData();
             games.put(gameId, game);
@@ -104,7 +111,7 @@ public class Database {
 
             JSONObject userObject = null;
             try {
-                userObject = (JSONObject) (new JSONParser().parse(new FileReader("C:\\Users\\ludvi\\IdeaProjects\\PdxSaveMove\\src\\RawData\\users\\" + userId + ".txt")));
+                userObject = (JSONObject) ((JSONObject) (new JSONParser().parse(new FileReader("C:\\Users\\ludvi\\IdeaProjects\\PdxSaveMove\\src\\RawData\\users\\" + userId + ".txt")))).get("data");
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (ParseException e) {
@@ -131,7 +138,11 @@ public class Database {
 
             category.setName((String)categoryObject.get("name"));
             category.setRules((String)categoryObject.get("rules"));
-            category.setMisc((boolean)categoryObject.get("miscellaneous"));
+            Object misc = categoryObject.get("miscellaneous");
+            if (misc != null) {
+                category.setMisc((boolean)misc);
+            }
+
 
             //category.storeData(categoryObject);
             categories.put(categoryId, category);
@@ -149,12 +160,28 @@ public class Database {
 
             run.setGame(games.get((String)runObject.get("game")));
             run.setComment((String)runObject.get("comment"));
-            run.setRunner(users.get((String)((JSONObject)runObject.get("players")).get("id")));
-            run.storeTime((Double)((JSONObject)runObject.get("times")).get("primary_t"));
+            run.setRunner(users.get((String)((JSONObject)((JSONArray)runObject.get("players")).get(0)).get("id")));
+            Object primaryT = ((JSONObject)runObject.get("times")).get("primary_t");
+            Long l = 1l;
+            if(primaryT.getClass() == l.getClass()) {
+                //System.out.println(primaryT);
+                run.storeTime(((Long) primaryT).doubleValue());
+            }
+            else {
+                run.storeTime((Double)primaryT);
+            }
 
             JSONObject status = (JSONObject)runObject.get("status");
             run.setVerified(((String)status.get("status")).equals("verified"));
-            run.setVerifier(users.get((String)runObject.get("examiner")));
+            String verifierId = (String)runObject.get("examiner");
+            User verifier = null;
+            if(users.containsKey(verifierId)) {
+                verifier = users.get(verifierId);
+            }
+            else {
+                addUser(verifierId);
+            }
+            run.setVerifier(verifier);
 
             String categoryId = (String)runObject.get("category");
             if(((String)runObject.get("level") != null)) {
@@ -171,32 +198,34 @@ public class Database {
             }
 
             Category category = categories.get(categoryId);
-            run.setCategory(category);
+            if(category != null) {
+                //System.out.println(categoryId);
+                run.setCategory(category);
 
-            Map values = (Map)runObject.get("values");
-            for(Object varId : values.keySet()) {
-                String valueId = (String)values.get(varId);
-                if(category.isSubCatVariable((String)varId)) {
-                    category.addRun(run, valueId);
+                Map values = (Map)runObject.get("values");
+                for(Object varId : values.keySet()) {
+                    String valueId = (String)values.get(varId);
+                    if(category.isSubCatVariable((String)varId)) {
+                        category.addRun(run, valueId);
+                    }
+                    if(variables.get((String)varId).getName().contains("Timing Method")) {
+                        String valueLabel = variables.get((String)varId).getValue(valueId).getLabel();
+                        if(valueLabel.equals("RTA NS5")) { run.setTimingMethod(Run.TimingMethod.RTA_NS5); }
+                        if(valueLabel.contains("RTA W/S5")) { run.setTimingMethod(Run.TimingMethod.RTA_WS5); }
+                        if(valueLabel.equals("IGT No Save Scum")) { run.setTimingMethod(Run.TimingMethod.IGT); }
+                        if(valueLabel.equals("IGT W/Save Scum")) { run.setTimingMethod(Run.TimingMethod.IGT_WSS); }
+                    }
+                    else {
+                        run.addVariableValue((String)varId, valueId);
+                    }
                 }
-                if(variables.get((String)varId).getName().contains("Timing Method")) {
-                    String valueLabel = variables.get((String)varId).getValue(valueId).getLabel();
-                    if(valueLabel.equals("RTA NS5")) { run.setTimingMethod(Run.TimingMethod.RTA_NS5); }
-                    if(valueLabel.contains("RTA W/S5")) { run.setTimingMethod(Run.TimingMethod.RTA_WS5); }
-                    if(valueLabel.equals("IGT No Save Scum")) { run.setTimingMethod(Run.TimingMethod.IGT); }
-                    if(valueLabel.equals("IGT W/Save Scum")) { run.setTimingMethod(Run.TimingMethod.IGT_WSS); }
+
+                if(!category.hasSubCategories()) {
+                    category.addRun(run, " ");
                 }
-                else {
-                    run.addVariableValue((String)varId, valueId);
-                }
+
+                runs.put(runId, run);
             }
-
-            if(!category.hasSubCategories()) {
-                category.addRun(run, " ");
-            }
-
-            //run.storeData();
-            runs.put(runId, run);
         }
     }
 

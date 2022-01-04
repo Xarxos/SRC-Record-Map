@@ -22,8 +22,8 @@ public class Main {
         */
         Database database = new Database();
         GameParser gameParser = new GameParser(database);
-        gameParser.parseGame("m1zjje26");
-        //database.addGame("m1zjje26");
+        //gameParser.parseGame("m1zjje26");
+        database.addGame("m1zjje26");
 
 
 

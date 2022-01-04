@@ -29,6 +29,7 @@ public class Category {
         this.database = database;
         this.game = game;
         this.subcategories.put(" ", new ArrayList<>());
+        this.runs.put(" ", new ArrayList<>());
     }
 
     public void storeData(JSONObject categoryObject) {
@@ -179,8 +180,13 @@ public class Category {
     public void addSubcategory(Variable subCatVariable) {
         if(subcategories.containsKey(" ")) {
             subcategories.remove(" ");
+            runs.remove(" ");
         }
-        subcategories.put(subCatVariable.getId(), (ArrayList)subCatVariable.getValues().values());
+        ArrayList<Variable.Value> subCats = new ArrayList(subCatVariable.getValues().values());
+        subcategories.put(subCatVariable.getId(), subCats);
+        for(Variable.Value subCat : subCats) {
+            runs.put(subCat.getId(), new ArrayList<>());
+        }
     }
 
     public String getId() {
@@ -253,6 +259,6 @@ public class Category {
     }
 
     public boolean hasSubCategories() {
-        return subcategories.size() > 1;
+        return !subcategories.containsKey(" ");
     }
 }

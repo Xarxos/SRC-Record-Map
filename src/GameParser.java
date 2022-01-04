@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Map;
 
 public class GameParser {
+    private String baseFilePath = "C:\\Users\\ludvi\\IdeaProjects\\PdxSaveMove\\src\\RawData\\";
+
     private String baseURL = "https://www.speedrun.com/api/v1/";
     private String gameURL = "https://www.speedrun.com/api/v1/games/";
     private String categoryURL = "https://www.speedrun.com/api/v1/categories/";
@@ -20,6 +22,8 @@ public class GameParser {
     private Database database;
     private final int P_MAX = 200;
 
+    private ArrayList<String> userIds = new ArrayList<>();
+
 
     public GameParser(Database database) {
         this.database = database;
@@ -27,7 +31,7 @@ public class GameParser {
 
     public void parseGame(String gameId) {
         parse("games", gameId, null);
-
+/*
         Object obj = null;
         try {
             obj = new JSONParser().parse(new FileReader("C:\\Users\\ludvi\\IdeaProjects\\PdxSaveMove\\src\\RawData\\games\\" + gameId + ".txt"));
@@ -43,13 +47,14 @@ public class GameParser {
             parse("users", (String)modId, null);
         }
 
+ */
+
         parseRunsForGame(gameId);
+        parseUsersFromRuns(gameId);
         parse("games", gameId, "levels");
         parse("games", gameId, "categories");
         parse("games", gameId, "variables");
     }
-
-    //public void parseUser()
 
     public void parse(String type, String id, String link) {
         URL url = null;
@@ -106,6 +111,41 @@ public class GameParser {
         con.disconnect();
     }
 
+    private void parseUsersFromRuns(String gameId) {
+        ArrayList<JSONArray> runArrays = new ArrayList<>();
+        Integer i = 0;
+        File runFile = null;
+        while((runFile = new File(baseFilePath + "games\\" + gameId + "_runs_" + i.toString() + ".txt")).exists()) {
+            try {
+                runArrays.add((JSONArray) ((JSONObject) (new JSONParser().parse(new FileReader(baseFilePath + "games\\" + gameId + "_runs_" + i.toString() + ".txt")))).get("data"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            i++;
+        }
+
+        for(JSONArray runArray : runArrays) {
+            for(Object run : runArray) {
+                String runnerId = (String)((JSONObject)((JSONArray)((JSONObject)run).get("players")).get(0)).get("id");
+                if(!userIds.contains(runnerId)) {
+                    userIds.add(runnerId);
+                    parse("users", runnerId, null);
+                }
+
+                String status = (String)((JSONObject)((JSONObject)run).get("status")).get("status");
+                if(!status.equals("new")) {
+                    String verifierId = (String)((JSONObject)((JSONObject)run).get("status")).get("examiner");
+                    if(!userIds.contains(verifierId)) {
+                        userIds.add(verifierId);
+                        parse("users", verifierId, null);
+                    }
+                }
+            }
+        }
+    }
+
     private String writeToFile2(HttpsURLConnection con, String fileName) throws IOException, ParseException {
         BufferedReader in = new BufferedReader(
                 new InputStreamReader(con.getInputStream()));
@@ -118,8 +158,11 @@ public class GameParser {
         gameFile2.createNewFile();
         FileWriter writer2 = new FileWriter("src/RawData/" + fileName + "_formatted.txt", true);
 
-
         String inputLine = in.readLine();
+        //if(fileName.equals("games/m1zjje26_categories")) {
+        //    System.out.println("writeToFile2: " + inputLine);
+        //}
+
 
         writer.write(inputLine);
         writer2.write(formatString(inputLine));
@@ -139,7 +182,7 @@ public class GameParser {
     }
 
     private String formatString(String str) {
-        //System.out.println(str);
+        //System.out.println("formatString: " + str);
         //ArrayList<Character> charArray = new ArrayList<>();
         String formatStr = "";
         int tabCount = 0;

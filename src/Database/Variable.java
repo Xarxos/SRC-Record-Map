@@ -156,7 +156,14 @@ public class Variable {
             val.id = valueId;
             val.label = (String) ((JSONObject)valueObjects.get(valueId)).get("label");
             val.rules = (String) ((JSONObject)valueObjects.get(valueId)).get("rules");
-            val.misc = (boolean)((JSONObject)((JSONObject)valueObjects.get(valueId)).get("flags")).get("miscellaneous");
+            JSONObject flags = (JSONObject) ((JSONObject)valueObjects.get(valueId)).get("flags");
+            if (flags != null) {
+                Object misc = flags.get("miscellaneous");
+                if (misc != null) {
+                    val.misc = (boolean)misc;
+                }
+            }
+
             values.put((String) valueId, val);
         }
     }

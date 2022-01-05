@@ -1,10 +1,4 @@
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-
-import java.io.FileReader;
-import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -31,88 +25,6 @@ public class Category {
         this.subcategories.put(" ", new ArrayList<>());
         this.subcategories.get(" ").add(null);
         this.runs.put(" ", new ArrayList<>());
-    }
-
-    public void storeData(JSONObject categoryObject) {
-        this.name = (String)categoryObject.get("name");
-        this.rules = (String)categoryObject.get("rules");
-        this.misc = (boolean)categoryObject.get("miscellaneous");
-    }
-
-/*
-    public void storeData(ArrayList<String> cleanedDataArray) {
-        ArrayList<Run> allRuns = null;
-        for (int i = 0; i < cleanedDataArray.size(); i++) {
-            //System.out.println(cleanedDataArray.get(i));
-            if (cleanedDataArray.get(i).compareTo("name") == 0) {
-                this.name = cleanedDataArray.get(i+1);
-            }
-            else if (cleanedDataArray.get(i).compareTo("rules") == 0) {
-                this.rules = cleanedDataArray.get(i+1);
-            }
-            else if (cleanedDataArray.get(i).compareTo("miscellaneous") == 0) {
-                this.misc = cleanedDataArray.get(i+1).contains("true");
-            }
-            else if (cleanedDataArray.get(i).compareTo("runs") == 0) {
-                //System.out.println("Category: " + name);
-                allRuns = database.parseRuns(cleanedDataArray.get(i+2));
-            }
-        }
-        for(int i = 0; i < allRuns.size(); i++) {
-            if(!allRuns.get(i).isVerified()) {
-                allRuns.remove(i);
-                i--;
-            }
-        }
-        for(Variable var : database.getVariables().values()) {
-            if(this.name.equals("Form Roman Empire")) {
-                //System.out.println(this.name + " | " + var.getName() + " | " + var.getId() + " | " + var.getCategory().getName());
-            }
-        }
-
-        for(Variable var : database.getVariables().values()) {
-            if(var.getCategory() != null && var.getCategory().equals(this) && var.getName().contains("Subcategory")) {
-                subcategories.put(var.getId(), new ArrayList<>());
-                for(Variable.Value value : var.getValues().values()) {
-                    subcategories.get(var.getId()).add(value);
-                    runs.put(value.id, new ArrayList<Run>());
-                    timingIndexes.put(value.id, new ArrayList<>());
-                    for(int i = 0; i < 4; i++) {
-                        timingIndexes.get(value.id).add(-1);
-                    }
-                }
-            }
-        }
-        if(subcategories.isEmpty()) {
-            subcategories.put(" ", new ArrayList<>());
-            //subcategories.get(" ").add(null);
-            runs.put(" ", allRuns);
-            Collections.sort(runs.get(" "));
-            timingIndexes.put(" ", new ArrayList<>());
-            for(int i = 0; i < 4; i++) {
-                timingIndexes.get(" ").add(-1);
-            }
-            storeTimingIndexes(runs.get(" "), " ");
-        }
-        else {
-            divideRunsBySubCat(allRuns);
-        }
-    }
-
- */
-
-    private void divideRunsBySubCat(ArrayList<Run> allRuns) {
-        for(Run run : allRuns) {
-            for(String varId : run.getVariableValues().keySet()) {
-                if(subcategories.containsKey(varId)) {
-                    runs.get(run.getVariableValues().get(varId)).add(run);
-                }
-            }
-        }
-        for(String subCat : runs.keySet()) {
-            Collections.sort(runs.get(subCat));
-            storeTimingIndexes(runs.get(subCat), subCat);
-        }
     }
 
     private void storeTimingIndexes(ArrayList<Run> subCatRuns, String subCat) {
@@ -191,32 +103,31 @@ public class Category {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public ArrayList<Variable.Value> getSubcategories() {
+        for(ArrayList<Variable.Value> subCat : subcategories.values()) {
+            return subCat;
+        }
+        return null;
+    }
+
+    public boolean isSubCatVariable(String varId) {
+        return subcategories.containsKey(varId);
+    }
+
+    public boolean hasSubCategories() {
+        return !subcategories.containsKey(" ");
     }
 
     public String getRules() {
         return rules;
     }
 
-    public void setRules(String rules) {
-        this.rules = rules;
-    }
-
     public boolean isMisc() {
         return misc;
-    }
-
-    public void setMisc(boolean misc) {
-        this.misc = misc;
     }
 
     public Run getWR(String subCat, int timingMethod) {
@@ -236,6 +147,22 @@ public class Category {
         //return null;
     }
 
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setRules(String rules) {
+        this.rules = rules;
+    }
+
+    public void setMisc(boolean misc) {
+        this.misc = misc;
+    }
+
     public void addRun(Run run, String subCatId) {
         this.runs.get(subCatId).add(run);
     }
@@ -243,20 +170,5 @@ public class Category {
     @Override
     public boolean equals(Object o) {
         return ((Category)o).id.equals(this.id);
-    }
-
-    public ArrayList<Variable.Value> getSubcategories() {
-        for(ArrayList<Variable.Value> subCat : subcategories.values()) {
-            return subCat;
-        }
-        return null;
-    }
-
-    public boolean isSubCatVariable(String varId) {
-        return subcategories.containsKey(varId);
-    }
-
-    public boolean hasSubCategories() {
-        return !subcategories.containsKey(" ");
     }
 }

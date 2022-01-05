@@ -51,52 +51,6 @@ public class Variable {
         this.database = database;
     }
 
-    public void storeData(ArrayList<String> cleanedDataArray) {
-        //System.out.println(cleanedDataArray);
-        int valueStartIndex = 0;
-        int valueEndIndex = 0;
-
-        for (int i = 0; i < cleanedDataArray.size(); i++) {
-            //System.out.println(cleanedDataArray.get(i));
-            if (cleanedDataArray.get(i).compareTo("name") == 0) {
-                this.name = cleanedDataArray.get(i+1);
-            }
-            else if (cleanedDataArray.get(i).compareTo("category") == 0 && !cleanedDataArray.get(i+1).equals("uri")) {
-                //System.out.println(this.name + " | " + cleanedDataArray.get(i+1));
-                if (cleanedDataArray.get(i+1).contains("null")) {
-                    category = null;
-                }
-                else {
-                    this.category = database.getCategory(cleanedDataArray.get(i+1));
-                }
-            }
-            else if (cleanedDataArray.get(i).compareTo("is-subcategory") == 0) {
-                this.subcategory = cleanedDataArray.get(i+1).contains("true");
-                valueEndIndex = i;
-            }
-            else if (cleanedDataArray.get(i).compareTo("values") == 0) {
-                valueStartIndex = i;
-            }
-        }
-        //System.out.println("END\n");
-
-        storeValuesData(cleanedDataArray, valueStartIndex, valueEndIndex);
-    }
-
-    public void storeValuesData(ArrayList<String> dataArray, int start, int end) {
-        for (int i = start; i < end; i++) {
-            if (dataArray.get(i).compareTo("label") == 0) {
-                Value value = new Value();
-                value.id = dataArray.get(i-1);
-                value.label = dataArray.get(i+1);
-                value.rules = dataArray.get(i+3);
-                value.misc = dataArray.get(i+6).contains("true");
-
-                values.put(value.id, value);
-            }
-        }
-    }
-
     public void printAll() {
         System.out.println("id: " + id);
         System.out.println("name: " + name);
@@ -123,20 +77,20 @@ public class Variable {
         return name;
     }
 
-    public boolean isSubcategory() {
-        return subcategory;
-    }
-
     public Value getValue(String valueId) {
         return values.get(valueId);
+    }
+
+    public Map<String, Value> getValues() {
+        return values;
     }
 
     public Category getCategory() {
         return category;
     }
 
-    public Map<String, Value> getValues() {
-        return values;
+    public boolean isSubcategory() {
+        return subcategory;
     }
 
     public void setName(String name) {
@@ -158,6 +112,7 @@ public class Variable {
             val.id = valueId;
             val.label = (String) ((JSONObject)valueObjects.get(valueId)).get("label");
             val.rules = (String) ((JSONObject)valueObjects.get(valueId)).get("rules");
+
             JSONObject flags = (JSONObject) ((JSONObject)valueObjects.get(valueId)).get("flags");
             if (flags != null) {
                 Object misc = flags.get("miscellaneous");

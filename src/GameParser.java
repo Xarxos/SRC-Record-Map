@@ -7,7 +7,6 @@ import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Map;
 
 public class GameParser {
     private String baseFilePath = "C:\\Users\\ludvi\\IdeaProjects\\PdxSaveMove\\src\\RawData\\";
@@ -19,35 +18,16 @@ public class GameParser {
     private String userURL = "https://www.speedrun.com/api/v1/users/";
     private String variableURL = "https://www.speedrun.com/api/v1/variables/";
 
-    private Database database;
     private final int P_MAX = 200;
 
     private ArrayList<String> userIds = new ArrayList<>();
 
+    public GameParser() {
 
-    public GameParser(Database database) {
-        this.database = database;
     }
 
     public void parseGame(String gameId) {
         parse("games", gameId, null);
-/*
-        Object obj = null;
-        try {
-            obj = new JSONParser().parse(new FileReader("C:\\Users\\ludvi\\IdeaProjects\\PdxSaveMove\\src\\RawData\\games\\" + gameId + ".txt"));
-        } catch (IOException | ParseException e) {
-            e.printStackTrace();
-        }
-
-        JSONObject jo = (JSONObject) obj;
-        JSONObject data = (JSONObject) jo.get("data");
-
-        Map mods = (Map)data.get("moderators");
-        for (Object modId : mods.keySet()) {
-            parse("users", (String)modId, null);
-        }
-
- */
 
         parseRunsForGame(gameId);
         parseUsersFromRuns(gameId);
@@ -77,8 +57,7 @@ public class GameParser {
             con = (HttpsURLConnection) url.openConnection();
             con.setRequestMethod("GET");
 
-            //writeToFile(con, fileName, urlNoOffset, 0, 0);
-            writeToFile2(con, fileName);
+            writeToFile(con, fileName);
 
         } catch (IOException | ParseException e) {
             e.printStackTrace();
@@ -100,9 +79,7 @@ public class GameParser {
                 con = (HttpsURLConnection) url.openConnection();
                 con.setRequestMethod("GET");
 
-                //writeToFile(con, fileName, urlNoOffset, 0, 0);
-
-                nextURL = writeToFile2(con, fileName);
+                nextURL = writeToFile(con, fileName);
                 page++;
             }
         } catch (IOException | ParseException e) {
@@ -146,7 +123,7 @@ public class GameParser {
         }
     }
 
-    private String writeToFile2(HttpsURLConnection con, String fileName) throws IOException, ParseException {
+    private String writeToFile(HttpsURLConnection con, String fileName) throws IOException, ParseException {
         BufferedReader in = new BufferedReader(
                 new InputStreamReader(con.getInputStream()));
 
@@ -159,10 +136,6 @@ public class GameParser {
         FileWriter writer2 = new FileWriter("src/RawData/" + fileName + "_formatted.txt", true);
 
         String inputLine = in.readLine();
-        //if(fileName.equals("games/m1zjje26_categories")) {
-        //    System.out.println("writeToFile2: " + inputLine);
-        //}
-
 
         writer.write(inputLine);
         writer2.write(formatString(inputLine));
@@ -182,17 +155,12 @@ public class GameParser {
     }
 
     private String formatString(String str) {
-        //System.out.println("formatString: " + str);
-        //ArrayList<Character> charArray = new ArrayList<>();
         String formatStr = "";
         int tabCount = 0;
         for(int i = 0; i < str.length()-1; i++) {
-            //System.out.println(str.substring(i,i+1));
             formatStr = formatStr.concat(str.substring(i,i+1));
-            //System.out.println(formatStr);
-            //charArray.add(str.charAt(i));
+
             if(str.charAt(i+1) == '}') {
-                //charArray.add('\n');
                 formatStr = formatStr.concat("\n");
                 tabCount--;
                 for(int t = 0; t < tabCount; t++) {
@@ -214,78 +182,6 @@ public class GameParser {
             }
         }
         formatStr = formatStr.concat("}");
-        //System.out.println(formatStr);
         return formatStr;
     }
-
-    private void writeToFile(HttpsURLConnection con, String fileName, String urlNoOffset, int urlOffset, int depth) throws IOException, ParseException {
-        BufferedReader in = new BufferedReader(
-                new InputStreamReader(con.getInputStream()));
-
-        File gameFile = new File("src/RawData/" + fileName + ".txt");
-        gameFile.createNewFile();
-        FileWriter writer = new FileWriter("src/RawData/" + fileName + ".txt", true);
-
-        String inputLine;
-        while ((inputLine = in.readLine()) != null) {
-            JSONObject page = (JSONObject) new JSONParser().parse(inputLine);
-            //JSONObject data = (JSONObject)page.get("data");
-            //System.out.println(page.get("data").toString());
-            if(inputLine.contains("\"data\":[")) {
-                JSONArray data = (JSONArray) page.get("data");
-                writer.write(((JSONObject)data.get(0)).toJSONString());
-            }
-            else {
-                JSONObject data = (JSONObject) page.get("data");
-                writer.write(data.toJSONString());
-            }
-
-            writer.close();
-            JSONObject pagination = (JSONObject)page.get("pagination");
-
-            if(pagination != null && (long)pagination.get("size") == P_MAX) {
-                JSONArray links = (JSONArray) pagination.get("links");
-
-                URL url = new URL(urlNoOffset + (urlOffset + P_MAX));
-                HttpsURLConnection newCon = (HttpsURLConnection) url.openConnection();
-                newCon.setRequestMethod("GET");
-
-                writeToFile(newCon, fileName, urlNoOffset, urlOffset + P_MAX, depth+1);
-
-                newCon.disconnect();
-            }
-
-            /*
-            int endIndex = inputLine.length()-1;
-            int paginationIndex = inputLine.indexOf("pagination");
-
-            if(paginationIndex != -1) {
-                endIndex = paginationIndex - 3;
-                writer.write(inputLine.substring(8, endIndex));
-
-
-                Object obj = null;
-                try {
-                    obj = new JSONParser().parse(inputLine.substring(inputLine.indexOf('{',paginationIndex), inputLine.length()-1));
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-
-                JSONObject jo = (JSONObject) obj;
-
-
-
-
-            }
-            else {
-                writer.write(inputLine.substring(8, endIndex));
-                writer.close();
-            }
-
-             */
-        }
-        in.close();
-    }
-
-
 }

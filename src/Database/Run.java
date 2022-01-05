@@ -24,94 +24,12 @@ public class Run implements Comparable {
     private double pureTime;
     private int[] time = new int[4];
 
-
-
     private TimingMethod timingMethod;
     private Map<String, String> variableValues = new HashMap<>();
 
     public Run(String id, Database database) {
         this.id = id;
         this.database = database;
-    }
-
-    //public void storeData(ArrayList<String> cleanedDataArray) {}
-
-    public void storeData(ArrayList<String> cleanedDataArray) {
-        int variableStartIndex = 0;
-
-        for (int i = 0; i < cleanedDataArray.size() - 2; i++) {
-            if (cleanedDataArray.get(i).compareTo("game") == 0) {
-                this.game = database.getGame(cleanedDataArray.get(i+1));
-            }
-            else if (cleanedDataArray.get(i).compareTo("level") == 0) {
-                if (cleanedDataArray.get(i+1).compareTo("null") != 0) {
-                    this.category = database.getCategory(cleanedDataArray.get(i+1));
-                }
-            }
-            else if (cleanedDataArray.get(i).compareTo("category") == 0) {
-                if(cleanedDataArray.get(i+1).compareTo("jdrogxld") == 0) {
-                    this.timingMethod = TimingMethod.IGT;
-                }
-                else if(cleanedDataArray.get(i+1).compareTo("q25e0qg2") == 0) {
-                    this.timingMethod = TimingMethod.RTA_NS5;
-                }
-                else if(cleanedDataArray.get(i+1).compareTo("rkl3oqwk") == 0) {
-                    this.timingMethod = TimingMethod.IGT_WSS;
-                }
-                else {
-                    this.category = database.getCategory(cleanedDataArray.get(i+1));
-                }
-            }
-            else if (cleanedDataArray.get(i).compareTo("comment") == 0) {
-                this.comment = cleanedDataArray.get(i+1);
-            }
-            else if (cleanedDataArray.get(i).compareTo("verified") == 0) {
-                this.verified = true;
-            }
-            else if (cleanedDataArray.get(i).compareTo("examiner") == 0 && cleanedDataArray.get(i-1).compareTo("rel") != 0) {
-                database.addUser(cleanedDataArray.get(i+1));
-                this.verifier = database.getUser(cleanedDataArray.get(i+1));
-            }
-            else if (cleanedDataArray.get(i).compareTo("players") == 0) {
-                database.addUser(cleanedDataArray.get(i+4));
-                this.runner = database.getUser(cleanedDataArray.get(i+4));
-            }
-            else if (cleanedDataArray.get(i).compareTo("primary_t") == 0) {
-                String cleaned = cleanedDataArray.get(i+1).replaceAll(":", "");
-                this.pureTime = Double.parseDouble(cleaned) / 3600000;
-                storeTime(Double.parseDouble(cleaned));
-            }
-            else if (cleanedDataArray.get(i).compareTo("values") == 0) {
-                variableStartIndex = i;
-                //System.out.println("StartSet: " + variableStartIndex);
-            }
-            else if (cleanedDataArray.get(i).compareTo("links") == 0
-                        && cleanedDataArray.get(i+2).compareTo("self") == 0) {
-                //System.out.println("Run: " + runner + "/" + time[0] + "h / " + time[1] + "m / " + time[2] + "s / " + time[3] + "ms");
-                //System.out.println("Start: " + variableStartIndex);
-                for (int j = i - 2; j > variableStartIndex; j -= 2) {
-                    /*
-                    System.out.println("j: " + j);
-                    if (cleanedDataArray.get(j).compareTo("size") == 0) {
-                        for (String str : cleanedDataArray) {
-                            System.out.println(str);
-                        }
-                    }
-
-                     */
-                    //database.addVariable(cleanedDataArray.get(j));
-                    variableValues.put(cleanedDataArray.get(j), cleanedDataArray.get(j+1));
-
-                    checkTimingMethod(cleanedDataArray.get(j), cleanedDataArray.get(j+1));
-                }
-            }
-        }
-        if(runner.getName().equals("Lambdax.x")) {
-            //for (int i = 0; i < cleanedDataArray.size() - 2; i++) {
-            //    System.out.println(cleanedDataArray.get(i));
-            //}
-            //printAll("");
-        }
     }
 
     private void checkTimingMethod(String varId, String valueId) {
@@ -128,12 +46,6 @@ public class Run implements Comparable {
         else if (valueLabel.contains("IGT")){
             this.timingMethod = TimingMethod.IGT_WSS;
         }
-        /*
-        else if (valueLabel.contains("null")) {
-            this.timingMethod = TimingMethod.RTA_WS5;
-        }
-
-         */
     }
 
     public void printAll(String prefixTabs) {
@@ -174,10 +86,6 @@ public class Run implements Comparable {
         }
     }
 
-    public void printRunner() {
-
-    }
-
     public void storeTime(double seconds) {
         int intSeconds = (int)seconds;
         seconds -= (double)intSeconds;
@@ -195,21 +103,12 @@ public class Run implements Comparable {
 
     @Override
     public int compareTo(Object compRun) {
-        if(runner.getName().equals("Lambdax.x") || runner.getName().equals("Sayuza1444")) {
-            //System.out.println("runner: " + runner.getName());
-            //printTime("\t");
-        }
-
-        //System.out.println("time: " + time[0] + "h / " + time[1] + "m / " + time[2] + "s / " + time[3] + "ms");
         int methodThis = 0;
         int methodComp = 0;
         double valueThis;
         double valueComp;
 
         if(this.verified) {
-            if(runner.getName().equals("Lambdax.x") || runner.getName().equals("Sayuza1444")) {
-                //System.out.println("Verified!?");
-            }
             if(this.timingMethod != null) {
                 methodThis = this.timingMethod.ordinal() + 1;
             }
@@ -217,10 +116,6 @@ public class Run implements Comparable {
         }
         else {
             valueThis = 100000d;
-            if(runner.getName().equals("Lambdax.x") || runner.getName().equals("Sayuza1444")) {
-                //System.out.println("Naaaaaah...!");
-                //System.out.println(valueThis);
-            }
         }
 
         if(((Run)compRun).verified) {
@@ -232,11 +127,6 @@ public class Run implements Comparable {
         else {
             valueComp = 100000d;
         }
-        if(runner.getName().equals("Lambdax.x") || runner.getName().equals("Sayuza1444")) {
-            //System.out.println(valueThis - valueComp);
-        }
-
-        //System.out.println("\t" + (methodThis + this.pureTime));
 
         double timeComp = valueThis - valueComp;
         return timeComp < 0 ? -1 : 1;
@@ -244,10 +134,6 @@ public class Run implements Comparable {
 
     public TimingMethod getTimingMethod() {
         return timingMethod;
-    }
-
-    public void setTimingMethod(TimingMethod timingMethod) {
-        this.timingMethod = timingMethod;
     }
 
     public User getRunner() {
@@ -276,7 +162,6 @@ public class Run implements Comparable {
             }
 
             return timeString;
-            //return time[0] + " hours\n " + time[1] + " minutes \n " + time[2] + " seconds" + ms;
         }
         else if (timingMethod == TimingMethod.IGT || timingMethod == TimingMethod.IGT_WSS) {
             timeString[0] = time[0] + " years";
@@ -284,7 +169,6 @@ public class Run implements Comparable {
             timeString[2] = time[2] + " days";
 
             return timeString;
-            //return time[0] + " years\n " + time[1] + "months\n " + time[2] + "days";
         }
         else {
             return null;
@@ -295,12 +179,12 @@ public class Run implements Comparable {
         return variableValues;
     }
 
-    public void addVariableValue(String varId, String valId) {
-        variableValues.put(varId, valId);
-    }
-
     public boolean isVerified() {
         return verified;
+    }
+
+    public void addVariableValue(String varId, String valId) {
+        variableValues.put(varId, valId);
     }
 
     public void setCategory(Category category) {
@@ -325,6 +209,10 @@ public class Run implements Comparable {
 
     public void setVerifier(User verifier) {
         this.verifier = verifier;
+    }
+
+    public void setTimingMethod(TimingMethod timingMethod) {
+        this.timingMethod = timingMethod;
     }
 }
 

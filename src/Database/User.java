@@ -4,7 +4,6 @@ import org.json.simple.parser.ParseException;
 
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Map;
 
 public class User {
@@ -23,55 +22,12 @@ public class User {
         this.id = id;
     }
 
-    public void storeData() {
-        JSONObject userObject = null;
-        try {
-            userObject = (JSONObject) (new JSONParser().parse(new FileReader("C:\\Users\\ludvi\\IdeaProjects\\PdxSaveMove\\src\\RawData\\users\\" + id + ".txt")));
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        Map names = (Map)userObject.get("names");
-        this.name = (String)names.get("international");
-        this.role = (String)userObject.get("role");
-    }
-/*
-    public void storeData(ArrayList<String> cleanedDataArray) {
-        for (int i = 0; i < cleanedDataArray.size(); i++) {
-            if (cleanedDataArray.get(i).compareTo("international") == 0
-                && cleanedDataArray.get(i-3).compareTo("code") != 0
-            ) {
-                this.name = cleanedDataArray.get(i+1);
-            }
-            else if (cleanedDataArray.get(i).compareTo("role") == 0) {
-                if (cleanedDataArray.get(i+1).compareTo("moderator") == 0) {
-                    this.role = Role.Mod;
-                }
-                else {
-                    this.role = Role.User;
-                }
-            }
-        }
-    }
-
- */
-
     public void printAll() {
         System.out.println("id: " + id);
         System.out.println("name: " + name);
 
         System.out.println("role: " + role);
-        /*
-        if (role == Role.Mod) {
-            System.out.println("moderator");
-        }
-        else {
-            System.out.println("user");
-        }
 
-         */
         System.out.println("");
     }
 

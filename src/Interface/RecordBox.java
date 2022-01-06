@@ -132,10 +132,10 @@ public class RecordBox extends JPanel {
         for(int i = 0; i < 4; i++) {
 
             if(subCat == null) {
-                WR_Run[i] = category.getWR(" ", i);
+                //WR_Run[i] = category.getWR(" ", i);
             }
             else {
-                WR_Run[i] = category.getWR(subCat.getId(), i);
+                //WR_Run[i] = category.getWR(subCat.getId(), i);
             }
 
             if(WR_Run[i] != null) {

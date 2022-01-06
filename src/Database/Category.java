@@ -14,7 +14,7 @@ public class Category {
     private String rules;
     private boolean misc;
 
-    private Map<String, ArrayList<Run>> runs = new HashMap<>();
+    private Map<String, Map<Run.TimingMethod, ArrayList<Run>>> runs = new HashMap<>();
     private Map<String, ArrayList<Integer>> timingIndexes = new HashMap<>();
     private Map<String, ArrayList<Variable.Value>> subcategories = new HashMap<>();
 
@@ -24,7 +24,11 @@ public class Category {
         this.game = game;
         this.subcategories.put(" ", new ArrayList<>());
         this.subcategories.get(" ").add(null);
-        this.runs.put(" ", new ArrayList<>());
+        this.runs.put(" ", new HashMap<>());
+        this.runs.get(" ").put(Run.TimingMethod.RTA_NS5, new ArrayList<>());
+        this.runs.get(" ").put(Run.TimingMethod.RTA_WS5, new ArrayList<>());
+        this.runs.get(" ").put(Run.TimingMethod.IGT, new ArrayList<>());
+        this.runs.get(" ").put(Run.TimingMethod.IGT_WSS, new ArrayList<>());
     }
 
     private void storeTimingIndexes(ArrayList<Run> subCatRuns, String subCat) {
@@ -55,16 +59,20 @@ public class Category {
             if(subCats.get(0) != null) {
                 for(Variable.Value subCat : subCats) {
                     System.out.println(prefixTabs + "Subcategory: " + subCat.getLabel());
-                    for (Run run : runs.get(subCat.getId())) {
-                        System.out.println(prefixTabs + "\tRun:\n" + prefixTabs +"\t----");
-                        run.printAll(prefixTabs + "\t\t");
+                    for(ArrayList<Run> timingMethod : runs.get(subCat.getId()).values()) {
+                        for (Run run : timingMethod) {
+                            System.out.println(prefixTabs + "\tRun:\n" + prefixTabs + "\t----");
+                            run.printAll(prefixTabs + "\t\t");
+                        }
                     }
                 }
             }
             else {
-                for (Run run : runs.get(" ")) {
-                    System.out.println(prefixTabs + "Run:\n" + prefixTabs +"----");
-                    run.printAll(prefixTabs + "\t");
+                for(ArrayList<Run> timingMethod : runs.get(" ").values()) {
+                    for (Run run : timingMethod) {
+                        System.out.println(prefixTabs + "\tRun:\n" + prefixTabs + "\t----");
+                        run.printAll(prefixTabs + "\t\t");
+                    }
                 }
             }
         }
@@ -79,9 +87,11 @@ public class Category {
         for(ArrayList<Variable.Value> subCats : subcategories.values()) {
             for(Variable.Value subCat : subCats) {
                 System.out.println(prefixTabs + "Subcategory: " + subCat.getLabel());
-                for (Run run : runs.get(subCat.getId())) {
-                    System.out.println(prefixTabs + "\tRun:\n----");
-                    run.printAll(prefixTabs + "\t\t");
+                for(ArrayList<Run> timingMethod : runs.get(subCat.getId()).values()) {
+                    for (Run run : timingMethod) {
+                        System.out.println(prefixTabs + "\tRun:\n" + prefixTabs + "\t----");
+                        run.printAll(prefixTabs + "\t\t");
+                    }
                 }
             }
         }
@@ -95,7 +105,11 @@ public class Category {
         ArrayList<Variable.Value> subCats = new ArrayList(subCatVariable.getValues().values());
         subcategories.put(subCatVariable.getId(), subCats);
         for(Variable.Value subCat : subCats) {
-            runs.put(subCat.getId(), new ArrayList<>());
+            runs.put(subCat.getId(), new HashMap<>());
+            runs.get(subCat.getId()).put(Run.TimingMethod.RTA_NS5, new ArrayList<>());
+            runs.get(subCat.getId()).put(Run.TimingMethod.RTA_WS5, new ArrayList<>());
+            runs.get(subCat.getId()).put(Run.TimingMethod.IGT, new ArrayList<>());
+            runs.get(subCat.getId()).put(Run.TimingMethod.IGT_WSS, new ArrayList<>());
         }
     }
 
@@ -129,7 +143,7 @@ public class Category {
     public boolean isMisc() {
         return misc;
     }
-
+/*
     public Run getWR(String subCat, int timingMethod) {
         int timingIndex = timingIndexes.get(subCat).get(timingMethod);
 
@@ -146,6 +160,8 @@ public class Category {
         }
         //return null;
     }
+
+ */
 
     public void setId(String id) {
         this.id = id;
@@ -164,7 +180,7 @@ public class Category {
     }
 
     public void addRun(Run run, String subCatId) {
-        this.runs.get(subCatId).add(run);
+        this.runs.get(subCatId).get(run.getTimingMethod()).add(run);
     }
 
     @Override

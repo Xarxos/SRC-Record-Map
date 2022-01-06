@@ -176,15 +176,18 @@ public class Database {
 
             Category category = categories.get(categoryId);
             if(category != null) {
+                //System.out.println("Category: " + category.getName());
                 run.setCategory(category);
 
                 Map values = (Map)runObject.get("values");
+                if (categoryId.equals("7kjp39xk") || categoryId.equals("wk6emvp2")) {
+                    run.setTimingMethod(Run.TimingMethod.RTA_NS5);
+                }
                 for(Object varId : values.keySet()) {
                     String valueId = (String)values.get(varId);
-                    if(category.isSubCatVariable((String)varId)) {
-                        category.addRun(run, valueId);
-                    }
-                    if(variables.get((String)varId).getName().contains("Timing Method")) {
+                    //System.out.println("Varname: " + variables.get((String)varId).getName());
+                    if(variables.get((String)varId).getName().contains("Timing Method")
+                    || variables.get((String)varId).getName().contains("timing method")) {
                         String valueLabel = variables.get((String)varId).getValue(valueId).getLabel();
                         if(valueLabel.equals("RTA NS5")) { run.setTimingMethod(Run.TimingMethod.RTA_NS5); }
                         if(valueLabel.contains("RTA W/S5")) { run.setTimingMethod(Run.TimingMethod.RTA_WS5); }
@@ -193,6 +196,15 @@ public class Database {
                     }
                     else {
                         run.addVariableValue((String)varId, valueId);
+                    }
+                }
+
+                for(Object varId : values.keySet()) {
+                    String valueId = (String)values.get(varId);
+                    if(category.isSubCatVariable((String)varId)) {
+                        String valueLabel = variables.get((String)varId).getValue(valueId).getLabel();
+                        //System.out.println("Valuelabel: " + valueLabel);
+                        category.addRun(run, valueId);
                     }
                 }
 

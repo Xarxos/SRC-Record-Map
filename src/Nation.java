@@ -4,17 +4,23 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 public class Nation {
+    private String tag;
     private String name;
     private String achievement;
     private BufferedImage onMapImage;
     private String flagFilePath;
     private String achievementIconFilePath;
     private int dataColor;
+    private int[] rgb = new int[3];
     private Point mapPos;
     private Point origin;
     private Database database;
 
     private Category category;
+
+    public Nation(String tag) {
+        this.tag = tag;
+    }
 
     public Nation(String name, int r, int g, int b, int x, int y, Database database, String categoryId, String achievement) throws IOException {
         this.name = name;
@@ -50,6 +56,29 @@ public class Nation {
         this.onMapImage = onMapImage;
     }
 
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
+    public void setDataColor(int r, int g, int b) {
+        this.rgb[0] = r;
+        this.rgb[1] = g;
+        this.rgb[2] = b;
+
+        r = (r << 16) & 0x00FF0000; //Shift red 16-bits and mask out other stuff
+        g = (g << 8) & 0x0000FF00; //Shift Green 8-bits and mask out other stuff
+        b = b & 0x000000FF; //Mask out anything not blue.
+        this.dataColor = 0xFF000000 | r | g | b;
+    }
+
     public int getDataColor() {
         return dataColor;
     }
@@ -80,5 +109,11 @@ public class Nation {
 
     public String getAchievementIconFilePath() {
         return achievementIconFilePath;
+    }
+
+    public void print() {
+        System.out.println("Tag: " + tag);
+        System.out.println("Name: " + name);
+        System.out.println("RGB: " + rgb[0] + "-" + rgb[1] + "-" + rgb[2]);
     }
 }

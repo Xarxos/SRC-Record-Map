@@ -1,11 +1,35 @@
+import javax.swing.*;
+import java.awt.*;
+import java.io.IOException;
+import java.util.ArrayList;
+
 public class Main {
     public static void main(String[] args) {
-        //SRCClient client = new SRCClient("https://www.speedrun.com/api/v1/games?_bulk=yes&max=1000");
-        //client.readGames();
-        //m1zjje26
         Database database = new Database();
-        database.addGame("m1zjje26");
-        //Game eu4 = new Game("m1zjje26", database);
-        //eu4.parseGame();
+        GameParser gameParser = new GameParser();
+        //gameParser.parseGame("m1zjje26");
+        //database.addGame("m1zjje26");
+        InfoParser infoParser = new InfoParser();
+        ArrayList<Achievement> achievements = null;
+        ArrayList<Nation> nations = null;
+        try {
+            achievements = new ArrayList<>(infoParser.parseAchievements().values());
+            nations = new ArrayList<>(infoParser.parseNations().values());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        for(Achievement achievement : achievements) {
+            //achievement.print();
+        }
+        for(Nation nation : nations) {
+            nation.print();
+        }
+/*
+        SwingUtilities.invokeLater(() -> {
+            GUI gui=new GUI(database);
+        });
+
+ */
     }
 }
